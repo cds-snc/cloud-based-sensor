@@ -21,10 +21,10 @@ RUN curl -Lo terraform.zip https://releases.hashicorp.com/terraform/"${TERRAFORM
 RUN pip3 install --upgrade requests setuptools \
     && pip3 install --upgrade botocore checkov
 
-RUN curl -sL https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWS_CLI_VERSION}.zip -o awscliv2.zip
-RUN unzip awscliv2.zip
-RUN aws/install
-RUN rm -rf \
+RUN curl -sL https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWS_CLI_VERSION}.zip -o awscliv2.zip \
+    && unzip awscliv2.zip \
+    && aws/install \
+    && rm -rf \
     awscliv2.zip \
     aws \
     /usr/local/aws-cli/v2/*/dist/aws_completer \
