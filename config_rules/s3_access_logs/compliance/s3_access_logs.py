@@ -163,7 +163,6 @@ def evaluate_compliance(configuration_item, event):
         if response["LoggingEnabled"]["TargetBucket"] == logging_bucket_name:
             return build_evaluation(configuration_item, "COMPLIANT")
         else:
-            responseStatus = "NON_COMPLIANT"
             return build_evaluation(
                 configuration_item,
                 "NON_COMPLIANT",
