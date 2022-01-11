@@ -102,18 +102,15 @@ def build_expected_response(
     compliance_resource_type=DEFAULT_RESOURCE_TYPE,
     annotation=None,
 ):
-    if not annotation:
-        return {
-            "ComplianceType": compliance_type,
-            "ComplianceResourceId": compliance_resource_id,
-            "ComplianceResourceType": compliance_resource_type,
-        }
-    return {
+    response = {
         "ComplianceType": compliance_type,
         "ComplianceResourceId": compliance_resource_id,
         "ComplianceResourceType": compliance_resource_type,
-        "Annotation": annotation,
     }
+    if annotation:
+        response["Annotation"] = annotation
+
+    return response
 
 
 def assert_successful_evaluation(test_class, response, resp_expected):
