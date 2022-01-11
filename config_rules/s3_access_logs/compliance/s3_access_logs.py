@@ -152,23 +152,23 @@ def get_assume_role_credentials(role_arn):
 def evaluate_compliance(configuration_item, event):
     "Check if the s3 logging has been enabled"
     check_defined(configuration_item, "configuration_item")
-    
-    bucket_name = configuration_item['resourceId']
+
+    bucket_name = configuration_item["resourceId"]
     s3 = get_client("s3", event)
     response = s3.get_bucket_logging(Bucket=bucket_name)
 
     logging_bucket_name = f"cbs-satellite-account-bucket{event['accountId']}"
 
-    if 'LoggingEnabled' in response:
-      if response['LoggingEnabled']['TargetBucket'] == logging_bucket_name:
-        return build_evaluation(configuration_item, "COMPLIANT")
-      else:
-        responseStatus = 'NON_COMPLIANT'
-        return build_evaluation(
-            configuration_item,
-            "NON_COMPLIANT",
-            f'The "{bucket_name}" bucket is not logging to {logging_bucket_name}',
-        )
+    if "LoggingEnabled" in response:
+        if response["LoggingEnabled"]["TargetBucket"] == logging_bucket_name:
+            return build_evaluation(configuration_item, "COMPLIANT")
+        else:
+            responseStatus = "NON_COMPLIANT"
+            return build_evaluation(
+                configuration_item,
+                "NON_COMPLIANT",
+                f'The "{bucket_name}" bucket is not logging to {logging_bucket_name}',
+            )
 
 
 def build_evaluation(configuration_item, compliance_type, annotation=None):
