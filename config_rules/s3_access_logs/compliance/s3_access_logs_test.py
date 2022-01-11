@@ -128,6 +128,8 @@ def assert_successful_evaluation(test_class, response, resp_expected):
 
 
 def s3_mock(target_bucket):
-    get_bucket_logging = {'LoggingEnabled': {'TargetBucket': target_bucket, 'TargetPrefix': ''}}
+    get_bucket_logging = {
+        "LoggingEnabled": {"TargetBucket": target_bucket, "TargetPrefix": ""}
+    }
     S3_CLIENT_MOCK.reset_mock(return_value=True)
     S3_CLIENT_MOCK.get_bucket_logging = MagicMock(return_value=get_bucket_logging)
