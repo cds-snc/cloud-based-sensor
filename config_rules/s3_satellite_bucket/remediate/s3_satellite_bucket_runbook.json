@@ -1,0 +1,39 @@
+{
+    "description": "Automation Document for s3 satellite bucket remediation",
+    "assumeRole": "{{ AutomationAssumeRole }}",
+    "schemaVersion": "0.3",
+    "parameters": {
+        "AutomationAssumeRole": {
+            "description": "The ARN of the role that allows Automation to perform the actions on your behalf.",
+            "type": "String"
+        },
+        "awsRegion": {
+            "description": "AWS region to restrict the S3 satellite account bucket content to.",
+            "default": "ca-central-1",
+            "type": "String"
+        },
+        "logArchiveAccount": {
+            "description": "AWS account ID that contains the log archive bucket.",
+            "default": "339850311124",
+            "type": "String"
+        },
+        "logArchiveBucket": {
+            "description": "Name of the S3 log archive bucket to replicate logs to.",
+            "default": "cbs-log-archive-339850311124",
+            "type": "String"
+        }                
+    },
+    "mainSteps": [
+        {
+            "maxAttempts": 3,
+            "inputs": {
+                "FunctionName": "CbsS3SatelliteBucketRemediate",
+                "Payload": "{\"awsRegion\": \"{{ awsRegion }}\",\"logArchiveAccount\": \"{{ logArchiveAccount }}\",\"logArchiveBucket\": \"{{ logArchiveBucket }}\"}"
+            },
+            "name": "invokeRemediateLambdaFunction",
+            "action": "aws:invokeLambdaFunction",
+            "timeoutSeconds": 120,
+            "onFailure": "Abort"
+        }
+    ]
+}
