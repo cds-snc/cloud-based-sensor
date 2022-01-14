@@ -37,11 +37,11 @@ provider "aws" {
 #
 # Variables
 #
-variable "acount_id_destination" {
+variable "account_id_destination" {
   type = string
 }
 
-variable "acount_id_source" {
+variable "account_id_source" {
   type = string
 }
 
@@ -51,11 +51,6 @@ variable "destination_bucket_arn" {
 
 variable "destination_kms_key_arn" {
   type = string
-}
-
-variable "region" {
-  default = "ca-central-1"
-  type    = string
 }
 
 
@@ -153,7 +148,7 @@ resource "aws_s3_bucket" "source" {
       status = "Enabled"
 
       destination {
-        account_id         = var.acount_id_destination
+        account_id         = var.account_id_destination
         bucket             = var.destination_bucket_arn
         replica_kms_key_id = var.destination_kms_key_arn
         access_control_translation {
@@ -190,17 +185,12 @@ provider "aws" {
 #
 # Variables
 #
-variable "acount_id_destination" {
+variable "account_id_destination" {
   type = string
 }
 
-variable "acount_id_source" {
+variable "account_id_source" {
   type = string
-}
-
-variable "region" {
-  default = "ca-central-1"
-  type    = string
 }
 
 
@@ -233,7 +223,7 @@ data "aws_iam_policy_document" "destination_allow_replicate" {
   statement {
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.acount_id_source}:role/S3Replicate"]
+      identifiers = ["arn:aws:iam::${var.account_id_source}:role/S3Replicate"]
     }
     actions = [
       "s3:ObjectOwnerOverrideToBucketOwner",
@@ -247,7 +237,7 @@ data "aws_iam_policy_document" "destination_allow_replicate" {
   statement {
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.acount_id_source}:role/S3Replicate"]
+      identifiers = ["arn:aws:iam::${var.account_id_source}:role/S3Replicate"]
     }
     actions = [
       "s3:List*",
@@ -286,7 +276,7 @@ data "aws_iam_policy_document" "destination_encrypt" {
     resources = ["*"]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.acount_id_destination}:root"]
+      identifiers = ["arn:aws:iam::${var.account_id_destination}:root"]
     }
   }
 
@@ -302,7 +292,7 @@ data "aws_iam_policy_document" "destination_encrypt" {
     resources = ["*"]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.acount_id_source}:root"]
+      identifiers = ["arn:aws:iam::${var.account_id_source}:root"]
     }
   }
 }
