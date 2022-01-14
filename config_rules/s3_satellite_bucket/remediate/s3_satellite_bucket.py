@@ -17,14 +17,16 @@ def create_satellite_bucket(event):
     "Creates the s3 satellite bucket"
 
     account_id = event["accountId"]
+    kms_key_id = event["ResourceProperties"]["kmsKeyId"]
     log_archive_account = event["ResourceProperties"]["logArchiveAccount"]
-    log_archive_bucket = event["ResourceProperties"]["logArchiveBucket"]    
+    log_archive_bucket = event["ResourceProperties"]["logArchiveBucket"]
     region = event["ResourceProperties"]["awsRegion"]
+    replication_role_arn = event["ResourceProperties"]["replicationRoleArn"]
     bucket_name = f"cbs-satellite-account-bucket{account_id}"
-    
+
     s3 = get_client("s3", event)
 
-    # Create the bucket    
+    # Create the bucket
     response = s3.create_bucket(
         Bucket=bucket_name,
         CreateBucketConfiguration={"LocationConstraint": region},
@@ -83,7 +85,7 @@ def create_satellite_bucket(event):
         response = s3.put_bucket_replication(
             Bucket=bucket_name,
             ReplicationConfiguration={
-                "Role": "string",
+                "Role": replication_role_arn,
                 "Rules": [
                     {
                         "ID": "CbsLogging",
@@ -94,6 +96,7 @@ def create_satellite_bucket(event):
                             "Bucket": log_archive_bucket,
                             "Account": log_archive_account,
                             "AccessControlTranslation": {"Owner": "Destination"},
+                            "EncryptionConfiguration": {"ReplicaKmsKeyID": kms_key_id},
                         },
                         "DeleteMarkerReplication": {"Status": "Enabled"},
                     },

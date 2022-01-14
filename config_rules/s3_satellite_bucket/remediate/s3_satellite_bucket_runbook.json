@@ -12,6 +12,10 @@
             "default": "ca-central-1",
             "type": "String"
         },
+        "kmsKeyId": {
+            "description": "KMS key ID used to encrypt objects during replication to the logArchiveBucket",
+            "type": "String"
+        },        
         "logArchiveAccount": {
             "description": "AWS account ID that contains the log archive bucket.",
             "default": "339850311124",
@@ -21,14 +25,18 @@
             "description": "Name of the S3 log archive bucket to replicate logs to.",
             "default": "cbs-log-archive-339850311124",
             "type": "String"
-        }                
+        },
+        "replicationRoleArn": {
+            "description": "Role ARN used to perform the s3 object replication.",
+            "type": "String"
+        }                         
     },
     "mainSteps": [
         {
             "maxAttempts": 3,
             "inputs": {
                 "FunctionName": "CbsS3SatelliteBucketRemediate",
-                "Payload": "{\"awsRegion\": \"{{ awsRegion }}\",\"logArchiveAccount\": \"{{ logArchiveAccount }}\",\"logArchiveBucket\": \"{{ logArchiveBucket }}\"}"
+                "Payload": "{\"awsRegion\":\"{{ awsRegion }}\",\"kmsKeyId\":\"{{ kmsKeyId }}\",\"logArchiveAccount\":\"{{ logArchiveAccount }}\",\"logArchiveBucket\":\"{{ logArchiveBucket }}\",\"replicationRoleArn\":\"{{ replicationRoleArn }}\"}"
             },
             "name": "invokeRemediateLambdaFunction",
             "action": "aws:invokeLambdaFunction",
