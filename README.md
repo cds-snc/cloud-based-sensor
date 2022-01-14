@@ -5,23 +5,28 @@ Infrastructure configuration to support the Canadian Centre for Cyber Security (
 # CBS logging strucuture
 
 ```
-cbs-central-logging-bucket
-│
-└───[aws_account_id]
-│   │
-│   └───[cloudtrail_logs]
-│   |       file1
-│   |       ...
-│   |   
-│   └───[elb_logs]
-│   |       file1
-│   |       ...
-│   |   
-│   └───[s3_access_logs]
-│   |       file1
-│   |       ...
-│   |   
-│   └───[vpc_flow_logs]
+cbs-central-logging-bucket/
+├─ [aws_account_id]/
+│  ├─ [cloudtrail_logs]/
+│  │  ├─ [trail_name]/
+│  │  │  ├─ file_1
+│  │  │  ├─ ...
+│  ├─ [elb_logs]/
+│  │  ├─ [elb_name]/
+│  │  │  ├─ file_1
+│  │  │  ├─ ...
+│  ├─ [s3_access_logs]/
+│  │  ├─ [bucket_name]/
+│  │  │  ├─ file_1
+│  │  │  ├─ ...
+│  ├─ [vpc_flow_logs]/
+│  │  ├─ [vpc_id]/
+│  │  │  ├─ file_1
+│  │  │  ├─ ...
+│  ├─ [waf_acl_logs]/
+│  │  ├─ [account_id]/
+│  │  │  ├─ file_1
+│  │  │  ├─ ...
 ```
 
 # Config rules
