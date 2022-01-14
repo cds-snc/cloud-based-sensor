@@ -3,6 +3,15 @@
 
 Remediated using AWS managed `AWS-ConfigureS3BucketLogging` remediation using Terraform.
 
+### AWS permissions required
+```json
+{
+  "Effect": "Allow",
+  "Action": "s3:PutBucketLogging",
+  "Resource": "arn:aws:s3:::*"
+}
+```
+
 ---
 
 ### Placeholder reference until implemented in Terraform
