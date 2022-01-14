@@ -27,7 +27,7 @@ To use the Terraform:
 1. `terraform apply` the Destination resources.
 An alternative to the above apply/fail would be to create a placeholder `S3Replicate` with no policies attached to start with.
 
-## Source bucket
+## Source
 ```hcl
 provider "aws" {
   region = "ca-central-1"
@@ -81,8 +81,6 @@ data "aws_iam_policy_document" "s3_replicate_assume" {
       type        = "Service"
       identifiers = ["s3.amazonaws.com"]
     }
-    not_actions   = []
-    not_resources = []
   }
 }
 
