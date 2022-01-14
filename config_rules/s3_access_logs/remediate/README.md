@@ -34,7 +34,19 @@ resource "aws_config_remediation_configuration" "this" {
   }
   parameter {
     name           = "TargetBucket"
-    resource_value = "log-archive-satellite-${var.account_id}"
+    static_value   = "log-archive-satellite-${var.account_id}"
+  }
+  parameter {
+    name           = "GrantedPermission"
+    static_value   = "FULL_CONTROL"
+  }
+  parameter {
+    name           = "GranteeType"
+    static_value   = "Group"
+  }
+  parameter {
+    name           = "GranteeUri"
+    static_value   = "http://acs.amazonaws.com/groups/s3/LogDelivery"
   }
   parameter {
     name         = "SSEAlgorithm"
