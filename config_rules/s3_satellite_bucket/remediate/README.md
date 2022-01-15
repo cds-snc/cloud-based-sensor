@@ -12,6 +12,7 @@ Remediation to create the `cbs-satellite-account-bucket${AWS_ACCOUNT_ID}` s3 buc
                 "s3:PutLifecycleConfiguration",
                 "s3:PutReplicationConfiguration",
                 "s3:PutBucketPublicAccessBlock",
+                "s3:PutBucketOwnershipControls",
                 "s3:PutBucketVersioning"
             ],
             "Resource": "arn:aws:s3:::cbs-satellite-account-bucket${AWS_ACCOUNT_ID}"

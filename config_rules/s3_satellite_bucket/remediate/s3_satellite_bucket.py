@@ -1,114 +1,159 @@
 import logging
+import json
+from urllib.request import Request, urlopen
+
 import boto3
-from botocore.exceptions import ClientError
+import botocore
 
 # Set to True to get the lambda to assume the Role attached on the Config Service (cross-account).
 ASSUME_ROLE_MODE = False
 
 
 def lambda_handler(event, context):
-    "Lambda handler that creates the missing satellite bucket"
-    return create_satellite_bucket(event)
+    "Lambda handler that creates the s3 satellite bucket"
+    params = get_params(event)
+    result = False
+
+    try:
+        result = create_satellite_bucket(params, event)
+    except Exception as error:
+        logging.error(error)
+        notify_slack(params, error)
+
+    return {"success": result}
 
 
-def create_satellite_bucket(event):
+def get_params(event):
+    """Extracts the required parameters from the Lambda invocation event.
+    These are provided by the runbook definition."""
+    return {
+        "accountId": event["accountId"],
+        "kmsKeyId": event["ResourceProperties"]["kmsKeyId"],
+        "logArchiveAccount": event["ResourceProperties"]["logArchiveAccount"],
+        "logArchiveBucket": event["ResourceProperties"]["logArchiveBucket"],
+        "awsRegion": event["ResourceProperties"]["awsRegion"],
+        "replicationRoleArn": event["ResourceProperties"]["replicationRoleArn"],
+        "slackWebhook": event["ResourceProperties"]["slackWebhook"],
+    }
+
+
+def create_satellite_bucket(params, event):
     "Creates the s3 satellite bucket"
-
-    account_id = event["accountId"]
-    kms_key_id = event["ResourceProperties"]["kmsKeyId"]
-    log_archive_account = event["ResourceProperties"]["logArchiveAccount"]
-    log_archive_bucket = event["ResourceProperties"]["logArchiveBucket"]
-    region = event["ResourceProperties"]["awsRegion"]
-    replication_role_arn = event["ResourceProperties"]["replicationRoleArn"]
-    bucket_name = f"cbs-satellite-account-bucket{account_id}"
 
     s3 = get_client("s3", event)
 
     # Create the bucket
-    response = s3.create_bucket(
+    account_id = params["accountId"]
+    region = params["awsRegion"]
+    bucket_name = f"cbs-satellite-account-bucket{account_id}"
+    s3.create_bucket(
         Bucket=bucket_name,
         CreateBucketConfiguration={"LocationConstraint": region},
     )
 
+    # Set ObjectWriter ACL
+    # Required for access logging auto-remediation
+    s3.put_bucket_ownership_controls(
+        Bucket=bucket_name,
+        OwnershipControls={
+            "Rules": [
+                {"ObjectOwnership": "ObjectWriter"},
+            ]
+        },
+    )
+
     # Versionning
-    if is_successful(response):
-        response = s3.put_bucket_versioning(
-            Bucket=bucket_name,
-            VersioningConfiguration={"Status": "Enabled"},
-        )
+    s3.put_bucket_versioning(
+        Bucket=bucket_name,
+        VersioningConfiguration={"Status": "Enabled"},
+    )
 
     # Encryption
-    if is_successful(response):
-        response = s3.put_bucket_encryption(
-            Bucket=bucket_name,
-            ServerSideEncryptionConfiguration={
-                "Rules": [
-                    {"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}},
-                ]
-            },
-        )
+    s3.put_bucket_encryption(
+        Bucket=bucket_name,
+        ServerSideEncryptionConfiguration={
+            "Rules": [
+                {"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}},
+            ]
+        },
+    )
 
     # Expire objects older than 14 days
-    if is_successful(response):
-        response = s3.put_bucket_lifecycle_configuration(
-            Bucket=bucket_name,
-            LifecycleConfiguration={
-                "Rules": [
-                    {
-                        "ID": "DeleteObjects",
-                        "Expiration": {
-                            "Days": 14,
-                        },
-                        "Status": "Enabled",
-                        "Filter": {"Prefix": ""},
+    s3.put_bucket_lifecycle_configuration(
+        Bucket=bucket_name,
+        LifecycleConfiguration={
+            "Rules": [
+                {
+                    "ID": "DeleteObjects",
+                    "Expiration": {
+                        "Days": 14,
                     },
-                ],
-            },
-        )
+                    "Status": "Enabled",
+                    "Filter": {"Prefix": ""},
+                },
+            ],
+        },
+    )
 
     # Block all public access
-    if is_successful(response):
-        response = s3.put_public_access_block(
-            Bucket=bucket_name,
-            PublicAccessBlockConfiguration={
-                "BlockPublicAcls": True,
-                "IgnorePublicAcls": True,
-                "BlockPublicPolicy": True,
-                "RestrictPublicBuckets": True,
-            },
-        )
+    s3.put_public_access_block(
+        Bucket=bucket_name,
+        PublicAccessBlockConfiguration={
+            "BlockPublicAcls": True,
+            "IgnorePublicAcls": True,
+            "BlockPublicPolicy": True,
+            "RestrictPublicBuckets": True,
+        },
+    )
 
-    # Replication to the log archive bucket
-    if is_successful(response):
-        response = s3.put_bucket_replication(
-            Bucket=bucket_name,
-            ReplicationConfiguration={
-                "Role": replication_role_arn,
-                "Rules": [
-                    {
-                        "ID": "CbsCentral",
-                        "Status": "Enabled",
-                        "Prefix": "",
-                        "SourceSelectionCriteria": {
-                            "SseKmsEncryptedObjects": {"Status": "Enabled"},
-                        },
-                        "Destination": {
-                            "Bucket": log_archive_bucket,
-                            "Account": log_archive_account,
-                            "AccessControlTranslation": {"Owner": "Destination"},
-                            "EncryptionConfiguration": {"ReplicaKmsKeyID": kms_key_id},
-                        },
+    # Replication to the CbsCentral log archive bucket
+    # Encrypts with a CMK and updates object ownership to CbsCentral
+    kms_key_id = params["kmsKeyId"]
+    log_archive_account = params["logArchiveAccount"]
+    log_archive_bucket = params["logArchiveBucket"]
+    replication_role_arn = params["replicationRoleArn"]
+    s3.put_bucket_replication(
+        Bucket=bucket_name,
+        ReplicationConfiguration={
+            "Role": replication_role_arn,
+            "Rules": [
+                {
+                    "ID": "CbsCentral",
+                    "Priority": 100,
+                    "Status": "Enabled",
+                    "Filter": {"Prefix": ""},
+                    "SourceSelectionCriteria": {
+                        "SseKmsEncryptedObjects": {"Status": "Enabled"},
                     },
-                ],
-            },
-        )
+                    "Destination": {
+                        "Bucket": log_archive_bucket,
+                        "Account": log_archive_account,
+                        "AccessControlTranslation": {"Owner": "Destination"},
+                        "EncryptionConfiguration": {"ReplicaKmsKeyID": kms_key_id},
+                    },
+                    "DeleteMarkerReplication": {"Status": "Enabled"},
+                },
+            ],
+        },
+    )
 
-    return response
+    return True
 
 
-def is_successful(response):
-    "Checks if a given boto3 response was successful"
-    return response["ResponseMetadata"]["HTTPStatusCode"] == 200
+def notify_slack(params, error):
+    "Post notification to Slack if the remediation fails"
+    account_id = params["accountId"]
+    message = {
+        "text": f":red: *Remediate failed:* `{account_id}` S3 satellite bucket\n```{error}```"
+    }
+
+    data = json.dumps(message).encode("utf-8")
+    req = Request(params["slackWebhook"])
+    req.add_header("Content-type", "application/json; charset=utf-8")
+    req.add_header("Content-Length", len(data))
+
+    with urlopen(req, data) as conn:
+        return conn.read().decode("utf-8")
 
 
 def get_client(service, event):

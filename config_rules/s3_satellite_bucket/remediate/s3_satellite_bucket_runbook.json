@@ -15,7 +15,7 @@
         "kmsKeyId": {
             "description": "KMS key ID used to encrypt objects during replication to the logArchiveBucket",
             "type": "String"
-        },        
+        },
         "logArchiveAccount": {
             "description": "AWS account ID that contains the log archive bucket.",
             "default": "339850311124",
@@ -29,14 +29,18 @@
         "replicationRoleArn": {
             "description": "Role ARN used to perform the s3 object replication.",
             "type": "String"
-        }                         
+        },
+        "slackWebhook": {
+            "description": "Slack webhook URL to post failure messages to.",
+            "type": "String"
+        }
     },
     "mainSteps": [
         {
             "maxAttempts": 3,
             "inputs": {
                 "FunctionName": "CbsS3SatelliteBucketRemediate",
-                "Payload": "{\"awsRegion\":\"{{ awsRegion }}\",\"kmsKeyId\":\"{{ kmsKeyId }}\",\"logArchiveAccount\":\"{{ logArchiveAccount }}\",\"logArchiveBucket\":\"{{ logArchiveBucket }}\",\"replicationRoleArn\":\"{{ replicationRoleArn }}\"}"
+                "Payload": "{\"awsRegion\":\"{{ awsRegion }}\",\"kmsKeyId\":\"{{ kmsKeyId }}\",\"logArchiveAccount\":\"{{ logArchiveAccount }}\",\"logArchiveBucket\":\"{{ logArchiveBucket }}\",\"replicationRoleArn\":\"{{ replicationRoleArn }}\",\"slackWebhook\":\"{{ slackWebhook }}\"}"
             },
             "name": "invokeRemediateLambdaFunction",
             "action": "aws:invokeLambdaFunction",
