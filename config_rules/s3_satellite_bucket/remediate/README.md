@@ -2,15 +2,29 @@
 Remediation to create the `cbs-satellite-account-bucket${AWS_ACCOUNT_ID}` s3 bucket if it gets deleted.
 ```json
 {
-  "Effect": "Allow",
-  "Action": [
-    "s3:CreateBucket",
-    "s3:PutEncryptionConfiguration",
-    "s3:PutLifecycleConfiguration",
-    "s3:PutBucketPublicAccessBlock",
-    "s3:PutReplicationConfiguration",
-  ],
-  "Resource": "arn:aws:s3:::cbs-satellite-account-bucket${AWS_ACCOUNT_ID}"
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:CreateBucket",
+                "s3:PutEncryptionConfiguration",
+                "s3:PutLifecycleConfiguration",
+                "s3:PutReplicationConfiguration",
+                "s3:PutBucketPublicAccessBlock",
+                "s3:PutBucketVersioning"
+            ],
+            "Resource": "arn:aws:s3:::cbs-satellite-account-bucket${AWS_ACCOUNT_ID}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetRole",
+                "iam:PassRole"
+            ],
+            "Resource": "${S3_REPLICATE_ROLE_ARN}"
+        }
+    ]
 }
 ```
 

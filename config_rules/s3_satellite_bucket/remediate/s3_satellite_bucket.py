@@ -8,8 +8,6 @@ ASSUME_ROLE_MODE = False
 
 def lambda_handler(event, context):
     "Lambda handler that creates the missing satellite bucket"
-
-    check_defined(event, "event")
     return create_satellite_bucket(event)
 
 
@@ -88,17 +86,18 @@ def create_satellite_bucket(event):
                 "Role": replication_role_arn,
                 "Rules": [
                     {
-                        "ID": "CbsLogging",
-                        "Prefix": "",
+                        "ID": "CbsCentral",
                         "Status": "Enabled",
-                        "ExistingObjectReplication": {"Status": "Enabled"},
+                        "Prefix": "",
+                        "SourceSelectionCriteria": {
+                            "SseKmsEncryptedObjects": {"Status": "Enabled"},
+                        },
                         "Destination": {
                             "Bucket": log_archive_bucket,
                             "Account": log_archive_account,
                             "AccessControlTranslation": {"Owner": "Destination"},
                             "EncryptionConfiguration": {"ReplicaKmsKeyID": kms_key_id},
                         },
-                        "DeleteMarkerReplication": {"Status": "Enabled"},
                     },
                 ],
             },
@@ -127,13 +126,6 @@ def get_client(service, event):
         aws_secret_access_key=credentials["SecretAccessKey"],
         aws_session_token=credentials["SessionToken"],
     )
-
-
-def check_defined(reference, reference_name):
-    "Check that a given object is defined"
-    if not reference:
-        raise Exception("Error: ", reference_name, "is not defined")
-    return reference
 
 
 def get_assume_role_credentials(role_arn):
