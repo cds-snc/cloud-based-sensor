@@ -148,12 +148,15 @@ def notify_slack(event, error):
         "text": f":red: *Remediate failed:* `{account_id}` S3 satellite bucket\n```{error}```"
     }
 
+    if not slack_webhook.startswith("https://"):
+        raise Exception("Slack wehbook must start with `https://`")
+
     data = json.dumps(message).encode("utf-8")
     req = Request(slack_webhook)
     req.add_header("Content-type", "application/json; charset=utf-8")
     req.add_header("Content-Length", len(data))
 
-    with urlopen(req, data) as conn:
+    with urlopen(req, data) as conn: # nosec URL validated above to ensure it's `https://`
         return conn.read().decode("utf-8")
 
 
