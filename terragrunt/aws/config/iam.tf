@@ -1,7 +1,3 @@
-// Allows AWS Config IAM role to access the S3 bucket where AWS Config records
-// are stored
-
-
 resource "aws_iam_role" "security_config" {
   name = "security_config"
 
