@@ -45,7 +45,6 @@ def create_satellite_bucket(params, event):
     # Create the bucket
     account_id = params["accountId"]
     region = params["awsRegion"]
-    # bucket_name = f"cbs-satellite-account-bucket{account_id}"
     bucket_name = f"cbs-log-archive-satellite-{account_id}"
     s3.create_bucket(
         Bucket=bucket_name,
