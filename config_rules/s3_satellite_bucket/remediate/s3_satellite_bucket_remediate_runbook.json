@@ -1,5 +1,5 @@
 {
-    "description": "Automation Document for s3 satellite bucket remediation",
+    "description": "Create the missing S3 satellite bucket in the account.",
     "assumeRole": "{{ AutomationAssumeRole }}",
     "schemaVersion": "0.3",
     "parameters": {

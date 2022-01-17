@@ -11,16 +11,16 @@ ASSUME_ROLE_MODE = False
 
 def lambda_handler(event, context):
     "Lambda handler that creates the s3 satellite bucket"
-    params = get_params(event)
-    result = False
+    is_success = False
 
     try:
-        result = create_satellite_bucket(params, event)
+        params = get_params(event)
+        is_success = create_satellite_bucket(params, event)
     except Exception as error:
         logging.error(error)
-        notify_slack(params, error)
+        notify_slack(event, error)
 
-    return {"success": result}
+    return {"success": is_success}
 
 
 def get_params(event):
@@ -45,7 +45,8 @@ def create_satellite_bucket(params, event):
     # Create the bucket
     account_id = params["accountId"]
     region = params["awsRegion"]
-    bucket_name = f"cbs-satellite-account-bucket{account_id}"
+    # bucket_name = f"cbs-satellite-account-bucket{account_id}"
+    bucket_name = f"cbs-log-archive-satellite-{account_id}"
     s3.create_bucket(
         Bucket=bucket_name,
         CreateBucketConfiguration={"LocationConstraint": region},
@@ -140,15 +141,16 @@ def create_satellite_bucket(params, event):
     return True
 
 
-def notify_slack(params, error):
+def notify_slack(event, error):
     "Post notification to Slack if the remediation fails"
-    account_id = params["accountId"]
+    account_id = event["accountId"]
+    slack_webhook = event["ResourceProperties"]["slackWebhook"]
     message = {
         "text": f":red: *Remediate failed:* `{account_id}` S3 satellite bucket\n```{error}```"
     }
 
     data = json.dumps(message).encode("utf-8")
-    req = Request(params["slackWebhook"])
+    req = Request(slack_webhook)
     req.add_header("Content-type", "application/json; charset=utf-8")
     req.add_header("Content-Length", len(data))
 
