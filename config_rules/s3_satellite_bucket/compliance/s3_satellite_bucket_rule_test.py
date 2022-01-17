@@ -29,7 +29,7 @@ class Boto3Mock:
 
 sys.modules["boto3"] = Boto3Mock()
 
-RULE = __import__("s3_satellite_bucket")
+RULE = __import__("s3_satellite_bucket_rule")
 
 
 class ComplianceTest(unittest.TestCase):
