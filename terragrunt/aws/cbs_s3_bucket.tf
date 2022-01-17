@@ -59,24 +59,24 @@ resource "aws_iam_policy" "replication" {
   "Statement": [
     {
       "Action": [
-        "s3             : GetReplicationConfiguration",
-        "s3             : ListBucket"
+        "s3:GetReplicationConfiguration",
+        "s3:ListBucket"
       ],
       "Effect"          : "Allow",
       "Resource"        : "arn:aws:s3:::${var.BUCKET_NAME}"
     },
     {
       "Action": [
-        "s3             : GetObjectVersion",
-        "s3             : GetObjectVersionAcl"
+        "s3:GetObjectVersion",
+        "s3:GetObjectVersionAcl"
       ],
       "Effect"          : "Allow",
       "Resource"        :  "arn:aws:s3:::${var.BUCKET_NAME}/*"
     },
     {
       "Action": [
-        "s3             : ReplicateObject",
-        "s3             : ReplicateDelete"
+        "s3:ReplicateObject",
+        "s3:ReplicateDelete"
       ],
       "Effect"          : "Allow",
       "Resource"        : "${var.CBS_CENTRAL_BUCKET_ARN}/*"
