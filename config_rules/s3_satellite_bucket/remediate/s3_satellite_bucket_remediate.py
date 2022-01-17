@@ -156,7 +156,9 @@ def notify_slack(event, error):
     req.add_header("Content-type", "application/json; charset=utf-8")
     req.add_header("Content-Length", len(data))
 
-    with urlopen(req, data) as conn: # nosec URL validated above to ensure it's `https://`
+    with urlopen(
+        req, data
+    ) as conn:  # nosec URL validated above to ensure it's `https://`
         return conn.read().decode("utf-8")
 
 

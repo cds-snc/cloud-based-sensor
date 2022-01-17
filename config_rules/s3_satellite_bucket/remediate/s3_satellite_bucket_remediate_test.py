@@ -160,10 +160,12 @@ class RemediateTest(unittest.TestCase):
         mock_request.assert_called_with("https://localhost/webhook")
 
     def test_notify_slack_invalid_url(self):
-        lambda_event = build_lambda_event(self.event_invalid_slack_webhook)  
+        lambda_event = build_lambda_event(self.event_invalid_slack_webhook)
         with self.assertRaises(Exception) as context:
             REMEDIATE.notify_slack(lambda_event, "foo")
-        self.assertEqual("Slack wehbook must start with `https://`", str(context.exception))
+        self.assertEqual(
+            "Slack wehbook must start with `https://`", str(context.exception)
+        )
 
 
 # Helper Functions
