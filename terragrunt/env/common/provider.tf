@@ -1,4 +1,4 @@
 provider "aws" {
-  region              = var.REGION
-  allowed_account_ids = [var.ACCOUNT_ID]
+  region              = var.region
+  allowed_account_ids = [var.account_id]
 }

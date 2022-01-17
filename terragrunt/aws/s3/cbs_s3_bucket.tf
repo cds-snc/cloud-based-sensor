@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "cbs_satellite_bucket" {
-  bucket = var.BUCKET_NAME
+  bucket = var.bucket_name
   acl    = "private"
 
   versioning {
@@ -21,7 +21,7 @@ resource "aws_s3_bucket" "cbs_satellite_bucket" {
       status = "Enabled"
 
       destination {
-        bucket = var.CBS_CENTRAL_BUCKET_ARN
+        bucket = var.cbs_central_bucket_arn
       }
     }
   }
@@ -63,7 +63,7 @@ resource "aws_iam_policy" "replication" {
         "s3:ListBucket"
       ],
       "Effect"          : "Allow",
-      "Resource"        : "arn:aws:s3:::${var.BUCKET_NAME}"
+      "Resource"        : "arn:aws:s3:::${var.bucket_name}"
     },
     {
       "Action": [
@@ -71,7 +71,7 @@ resource "aws_iam_policy" "replication" {
         "s3:GetObjectVersionAcl"
       ],
       "Effect"          : "Allow",
-      "Resource"        :  "arn:aws:s3:::${var.BUCKET_NAME}/*"
+      "Resource"        :  "arn:aws:s3:::${var.bucket_name}/*"
     },
     {
       "Action": [
@@ -79,7 +79,7 @@ resource "aws_iam_policy" "replication" {
         "s3:ReplicateDelete"
       ],
       "Effect"          : "Allow",
-      "Resource"        : "${var.CBS_CENTRAL_BUCKET_ARN}/*"
+      "Resource"        : "${var.cbs_central_bucket_arn}/*"
     }
   ]
 }
