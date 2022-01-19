@@ -156,7 +156,9 @@ def evaluate_compliance(configuration_item, event):
     s3 = get_client("s3", event)
     response = s3.list_buckets()
 
-    bucket_name = f"cbs-satellite-account-bucket{event['accountId']}"
+    rule_parameters = json.loads(event["ruleParameters"])
+    bucket_name = rule_parameters["satelliteBucket"]
+
     if any(b["Name"] == bucket_name for b in response["Buckets"]):
         return build_evaluation(configuration_item, "COMPLIANT")
     else:
