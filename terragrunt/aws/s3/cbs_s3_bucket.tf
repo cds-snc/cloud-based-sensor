@@ -1,9 +1,18 @@
 resource "aws_s3_bucket" "cbs_satellite_bucket" {
+  # checkov:skip=CKV_AWS_18: Access logging will be enabled on the final bucket infrastructure
   bucket = var.bucket_name
   acl    = "private"
 
   versioning {
     enabled = true
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
   }
 
   lifecycle_rule {
@@ -25,6 +34,15 @@ resource "aws_s3_bucket" "cbs_satellite_bucket" {
       }
     }
   }
+}
+
+resource "aws_s3_bucket_public_access_block" "cbs_satellite_bucket" {
+  bucket = aws_s3_bucket.cbs_satellite_bucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "random_pet" "this" {
