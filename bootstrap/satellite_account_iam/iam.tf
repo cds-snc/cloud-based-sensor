@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "config_execution_role" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::652919170451:root"]
+      identifiers = ["arn:aws:iam::${var.central_account_id}:root"]
     }
   }
 }
