@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - config_rules/**
+      - terragrunt/aws/config/config_rules/**
       - .github/workflows/ci_code.yml
 
 jobs:
