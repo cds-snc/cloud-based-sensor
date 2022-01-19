@@ -30,8 +30,8 @@ cbs-central-logging-bucket/
 ```
 
 # Config rules
-* [`s3_satellite_bucket`](./config_rules/s3_satellite_bucket): Checks that an account has the expected CBS s3 satellite bucket. 
-* [`s3_access_logs`](./config_rules/s3_access_logs): Checks that all s3 buckets are replicating to the expected CBS s3 satellite bucket. 
+* [`s3_satellite_bucket`](./terragrunt/aws/config/s3_satellite_bucket.tf): Checks that an account has the expected CBS s3 satellite bucket. 
+* [`s3_access_logs`](./terragrunt/aws/config/s3_access_logs.tf): Checks that all s3 buckets are replicating to the expected CBS s3 satellite bucket. 
 
 # Common Lambda IAM permissions
 
