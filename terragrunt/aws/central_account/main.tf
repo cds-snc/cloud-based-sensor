@@ -12,7 +12,6 @@ module "gh_oidc_roles" {
       claim     = "ref:refs/heads/main"
     }
   ]
-
   billing_tag_value = var.billing_code
 }
 
