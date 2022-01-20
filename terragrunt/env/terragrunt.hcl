@@ -3,9 +3,9 @@ locals {
 }
 
 inputs = {
-  account_id        = "${local.vars.inputs.account_id}"
+  account_id        = "${get_aws_account_id()}"
   billing_tag_key   = "CostCentre"
-  billing_tag_value = "cbs-${local.vars.inputs.account_id}"   
+  billing_tag_value = "cbs-${get_aws_account_id()}"   
   region            = "ca-central-1" 
 }
 
@@ -17,7 +17,7 @@ remote_state {
   }
   config = {
     encrypt        = true
-    bucket         = "cbs-${local.vars.inputs.account_id}-tfstate"
+    bucket         = "cbs-${get_aws_account_id()}-tfstate"
     dynamodb_table = "tfstate-lock"
     region         = "ca-central-1"
     key            = "${path_relative_to_include()}/terraform.tfstate"
