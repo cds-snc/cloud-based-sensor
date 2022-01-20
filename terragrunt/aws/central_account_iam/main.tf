@@ -29,9 +29,10 @@ data "aws_iam_policy" "admin" {
 resource "aws_iam_role_policy_attachment" "admin" {
   role       = local.cbs_admin_role
   policy_arn = data.aws_iam_policy.admin.arn
+  depends_on = [module.gh_oidc_roles]
 }
 
-resource "aws_iam_role_policy_attachment" "config_terraform_policy" {
+resource "aws_iam_role_policy_attachment" "service_principal" {
   role       = local.cbs_admin_role
   policy_arn = aws_iam_policy.service_principal.arn
   depends_on = [module.gh_oidc_roles]
@@ -40,7 +41,7 @@ resource "aws_iam_role_policy_attachment" "config_terraform_policy" {
 resource "aws_iam_policy" "service_principal" {
   name   = "cbs-central-assume-role-terraform"
   path   = "/"
-  policy = data.aws_iam_policy_document.config_terraform_policy.json
+  policy = data.aws_iam_policy_document.service_principal.json
 }
 
 data "aws_iam_policy_document" "service_principal" {
