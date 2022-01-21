@@ -56,3 +56,23 @@ data "aws_iam_policy_document" "config_terraform_policy" {
     resources = ["*"]
   }
 }
+
+#
+# Role used by satellite account S3 buckets to replicate objects to
+# the CbsCentral log archive S3 bucket.
+#
+resource "aws_iam_role" "s3_replicate" {
+  name               = "CbsSatelliteReplicateToLogArchive"
+  assume_role_policy = data.aws_iam_policy_document.s3_replicate_assume.json
+}
+
+data "aws_iam_policy_document" "s3_replicate_assume" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    effect  = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+  }
+}

@@ -1,9 +1,9 @@
 terraform {
-  source = "../../../aws//config"
+  source = "../../../aws//satellite_bucket"
 }
 
 inputs = {
-  config_max_execution_frequency = "TwentyFour_Hours"
+  log_archive_kms_key_arn = "someKmsKeyArn"
 }
 
 include {

@@ -12,7 +12,7 @@ module "gh_oidc_roles" {
       claim     = "ref:refs/heads/main"
     }
   ]
-  billing_tag_value = var.billing_code
+  billing_tag_value = var.billing_tag_value
 }
 
 data "aws_iam_policy" "admin" {

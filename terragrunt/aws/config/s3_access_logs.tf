@@ -1,7 +1,7 @@
 resource "aws_config_config_rule" "cbs_s3_bucket_logging_enabled" {
   name             = "cbs_s3_bucket_logging_enabled"
   description      = "A Config rule that checks whether logging to the cbs satellite is enabled for your S3 buckets."
-  input_parameters = jsonencode({ "targetBucket" = var.bucket_name })
+  input_parameters = jsonencode({ "targetBucket" = var.satellite_bucket_name })
 
   source {
     owner             = "AWS"
@@ -29,7 +29,7 @@ resource "aws_config_remediation_configuration" "cbs_s3_bucket_logging_enabled" 
   }
   parameter {
     name         = "TargetBucket"
-    static_value = var.bucket_name
+    static_value = var.satellite_bucket_name
   }
   parameter {
     name         = "GrantedPermission"
