@@ -9,7 +9,7 @@ module "gh_oidc_roles" {
     {
       name      = local.cbs_admin_role
       repo_name = "cloud-based-sensor"
-      claim     = "ref:refs/heads/main"
+      claim     = "*"
     }
   ]
   billing_tag_value = var.billing_tag_value
