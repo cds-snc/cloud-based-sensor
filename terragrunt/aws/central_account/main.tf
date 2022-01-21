@@ -1,5 +1,9 @@
 locals {
-  cbs_admin_role = "ConfigTerraformAdministratorRole"
+  cbs_admin_role       = "ConfigTerraformAdministratorRole"
+  cbs_managed_accounts = var.cbs_managed_accounts
+  trusted_role_arns = [
+    for account in local.cbs_managed_accounts : "arn:aws:iam::${account}:role/ConfigTerraformAdminExecutionRole"
+  ]
 }
 
 # Role used by Terraform to manage all satellite accounts

@@ -12,6 +12,7 @@ inputs = {
   satellite_account_ids              = ["722713121070"]
   satellite_bucket_name              = "cbs-satellite-${get_aws_account_id()}"
   satellite_s3_replicate_role_name   = "CbsSatelliteReplicateToLogArchive"
+  cbs_managed_accounts = split("\n", chomp(file("../../satellite_accounts.json")))
 }
 
 remote_state {
