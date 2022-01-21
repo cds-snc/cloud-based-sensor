@@ -9,10 +9,9 @@ inputs = {
   log_archive_account_id             = "339850311124"
   log_archive_bucket_name            = "cbs-log-archive-339850311124"
   region                             = "ca-central-1"
-  satellite_account_ids              = ["722713121070"]
   satellite_bucket_name              = "cbs-satellite-${get_aws_account_id()}"
   satellite_s3_replicate_role_name   = "CbsSatelliteReplicateToLogArchive"
-  cbs_managed_accounts = split("\n", chomp(file("../../satellite_accounts.json")))
+  satellite_account_ids              = split("\n", chomp(file("../../satellite_accounts.json")))
 }
 
 remote_state {

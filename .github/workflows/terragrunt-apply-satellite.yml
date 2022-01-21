@@ -35,7 +35,7 @@ jobs:
       - name: Read account file
         id: set-matrix
         run: |
-          accounts=$(jq -c "{\"include\": . }" satellite_accounts.json)
+          accounts=$(jq -n -c "{\"include\": [inputs | {"account": .} ] }"  satellite_accounts.json)
           echo "::set-output name=matrix::$accounts"
 
   terragrunt-apply:
@@ -80,7 +80,7 @@ jobs:
               - 'terragrunt/aws/config/**' 
               - 'terragrunt/env/satellite/config/**'             
             s3:
-              - 'terragrunt/aws/s3/**'  
+              - 'terragrunt/aws/satellite_bucket/**'  
               - 'terragrunt/env/satellite/s3/**'     
             common:
               - '.github/workflows/terragrunt-apply-satellite.yml'

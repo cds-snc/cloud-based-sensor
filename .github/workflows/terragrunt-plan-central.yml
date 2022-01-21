@@ -33,7 +33,7 @@ jobs:
       - name: Read account file
         id: set-accounts
         run: |
-          accounts=$(jq -c . satellite_accounts.json)
+          accounts=$(jq -n -c "{\"include\": [inputs | {"account": .} ] }"  satellite_accounts.json)
           echo "::set-output name=accounts::$accounts"
 
   terragrunt-plan:

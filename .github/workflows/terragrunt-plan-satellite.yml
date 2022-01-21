@@ -78,7 +78,7 @@ jobs:
               - 'terragrunt/aws/config/**' 
               - 'terragrunt/env/satellite/config/**'             
             s3:
-              - 'terragrunt/aws/s3/**'  
+              - 'terragrunt/aws/satellite_bucket/**'  
               - 'terragrunt/env/satellite/s3/**'     
             common:
               - '.github/workflows/terragrunt-plan-satellite.yml'
