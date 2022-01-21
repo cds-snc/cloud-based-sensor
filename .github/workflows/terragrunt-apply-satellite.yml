@@ -1,0 +1,104 @@
+name: "Terragrunt apply satellite accounts"
+
+on:
+  workflow_dispatch:
+    # branches:
+    #   - main
+    # paths:
+    #   - ".github/workflows/terragrunt-apply-satellite.yml"
+    #   - "terragrunt/aws/**"
+    #   - "terragrunt/env/**"
+
+env:
+  AWS_REGION: ca-central-1
+  CONFTEST_VERSION: 0.27.0
+  TERRAFORM_VERSION: 1.1.4
+  TERRAGRUNT_VERSION: 0.36.0
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+  actions: write
+  checks: write
+  statuses: write
+
+jobs:
+  retrieve-accounts:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Read account file
+        id: set-matrix
+        run: |
+          accounts=$(jq -n -c "{\"include\": [inputs | {"account": .} ] }"  satellite_accounts.json)
+          echo "::set-output name=matrix::$accounts"
+
+  terragrunt-apply:
+    needs: retrieve-accounts
+    strategy:
+      fail-fast: false
+      matrix: ${{fromJson(needs.retrieve-accounts.outputs.matrix)}}
+
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@3d8debd658c92063839bc97da5c2427100420dec # v1.3.2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      - name: Setup Terragrunt
+        run: |
+          mkdir bin
+          wget -O bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/v$TERRAGRUNT_VERSION/terragrunt_linux_amd64
+          chmod +x bin/*
+          echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
+
+      - name: Install Conftest
+        run: |
+          wget "https://github.com/open-policy-agent/conftest/releases/download/v${{ env.CONFTEST_VERSION }}/conftest_${{ env.CONFTEST_VERSION }}_Linux_x86_64.tar.gz" \
+          && wget "https://github.com/open-policy-agent/conftest/releases/download/v${{ env.CONFTEST_VERSION }}/checksums.txt" \
+          && grep 'Linux_x86_64.tar.gz' < checksums.txt | sha256sum --check  --status \
+          && tar -zxvf "conftest_${{ env.CONFTEST_VERSION }}_Linux_x86_64.tar.gz" conftest \
+          && mv conftest /usr/local/bin \
+          && rm "conftest_${{ env.CONFTEST_VERSION }}_Linux_x86_64.tar.gz" checksums.txt
+
+      - uses: cds-snc/paths-filter@v2.10.3
+        id: filter
+        with:
+          filters: |
+            config:
+              - 'terragrunt/aws/config/**' 
+              - 'terragrunt/env/satellite/config/**'             
+            s3:
+              - 'terragrunt/aws/satellite_bucket/**'  
+              - 'terragrunt/env/satellite/s3/**'     
+            common:
+              - '.github/workflows/terragrunt-apply-satellite.yml'
+              - 'terragrunt/env/common/**'
+              - 'terragrunt/env/terragrunt.hcl'
+
+      - name: configure aws credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          role-to-assume: arn:aws:iam::339850311124:role/ConfigTerraformAdministratorRole
+          aws-region: 'ca-central-1'
+
+      - name: Terragrunt apply config
+        if: ${{ steps.filter.outputs.config == 'true' || steps.filter.outputs.common == 'true' }}
+        working-directory: "terragrunt/env/satellite/config"
+        run: terragrunt apply --terragrunt-non-interactive -auto-approve --terragrunt-iam-role "arn:aws:iam::${{ matrix.account}}:role/ConfigTerraformAdminExecutionRole"
+
+      - name: Terragrunt plan s3
+        if: ${{ steps.filter.outputs.s3 == 'true' || steps.filter.outputs.common == 'true' }}
+        working-directory: "terragrunt/env/satellite/s3"
+        run: terragrunt apply --terragrunt-non-interactive -auto-approve --terragrunt-iam-role "arn:aws:iam::${{ matrix.account}}:role/ConfigTerraformAdminExecutionRole"

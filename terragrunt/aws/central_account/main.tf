@@ -1,5 +1,9 @@
 locals {
-  cbs_admin_role = "ConfigTerraformAdministratorRole"
+  cbs_admin_role       = "ConfigTerraformAdministratorRole"
+  cbs_managed_accounts = var.satellite_account_ids
+  trusted_role_arns = [
+    for account in local.cbs_managed_accounts : "arn:aws:iam::${account}:role/ConfigTerraformAdminExecutionRole"
+  ]
 }
 
 # Role used by Terraform to manage all satellite accounts
@@ -9,7 +13,7 @@ module "gh_oidc_roles" {
     {
       name      = local.cbs_admin_role
       repo_name = "cloud-based-sensor"
-      claim     = "ref:refs/heads/main"
+      claim     = "*"
     }
   ]
   billing_tag_value = var.billing_tag_value
