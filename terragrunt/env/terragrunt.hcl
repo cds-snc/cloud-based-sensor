@@ -1,13 +1,14 @@
 locals {
-  vars = read_terragrunt_config("../env_vars.hcl")
+  vars                   = read_terragrunt_config("../env_vars.hcl")
+  log_archive_account_id = "339850311124"
 }
 
 inputs = {
   account_id                         = "${get_aws_account_id()}"
   billing_tag_key                    = "CostCentre"
   billing_tag_value                  = "cbs-${get_aws_account_id()}"
-  log_archive_account_id             = "339850311124"
-  log_archive_bucket_name            = "cbs-log-archive-339850311124"
+  log_archive_account_id             = local.log_archive_account_id
+  log_archive_bucket_name            = "cbs-log-archive-${local.log_archive_account_id}"
   region                             = "ca-central-1"
   satellite_bucket_name              = "cbs-satellite-${get_aws_account_id()}"
   satellite_s3_replicate_role_name   = "CbsSatelliteReplicateToLogArchive"

@@ -40,4 +40,14 @@ data "aws_iam_policy_document" "log_archive_read" {
       "${module.log_archive_bucket.s3_bucket_arn}/*"
     ]
   }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt"
+    ]
+    resources = [
+      aws_kms_key.log_archive_encrypt.arn
+    ]
+  }
 }

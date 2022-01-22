@@ -1,7 +1,7 @@
 resource "aws_kms_key" "log_archive_encrypt" {
   description         = "Encrypt objects in the log-archive S3 bucket"
   enable_key_rotation = "true"
-  policy              = data.aws_iam_policy_document.log_archive_encrypt.json
+  policy              = sensitive(data.aws_iam_policy_document.log_archive_encrypt.json)
 }
 
 data "aws_iam_policy_document" "log_archive_encrypt" {
@@ -16,6 +16,19 @@ data "aws_iam_policy_document" "log_archive_encrypt" {
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${var.account_id}:root"]
+    }
+  }
+
+  # Allow CBS principal to decrypt using the key
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt"
+    ]
+    resources = ["*"]
+    principals {
+      type        = "AWS"
+      identifiers = [var.cbs_principal_arn]
     }
   }
 
