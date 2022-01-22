@@ -15,7 +15,7 @@ data "aws_iam_policy_document" "log_archive_encrypt" {
     resources = ["*"]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.account_id}:root"]
+      identifiers = [var.account_id]
     }
   }
 
@@ -33,22 +33,18 @@ data "aws_iam_policy_document" "log_archive_encrypt" {
   }
 
   # Allow satellite accounts to use the key for encryption
-  dynamic "statement" {
-    for_each = var.satellite_account_ids
-
-    content {
-      effect = "Allow"
-      actions = [
-        "kms:Encrypt",
-        "kms:ReEncrypt*",
-        "kms:GenerateDataKey*",
-        "kms:DescribeKey"
-      ]
-      resources = ["*"]
-      principals {
-        type        = "AWS"
-        identifiers = ["arn:aws:iam::${statement.value}:root"]
-      }
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = ["*"]
+    principals {
+      type        = "AWS"
+      identifiers = local.trusted_replicate_role_arns
     }
   }
 }
