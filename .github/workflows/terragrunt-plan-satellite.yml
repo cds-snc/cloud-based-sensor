@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     # paths:
     #   - ".github/workflows/terragrunt-plan-satellite.yml"
-    #   - "satellite_accounts.json"    
+    #   - "satellite_accounts.json"
     #   - "terragrunt/aws/**"
     #   - "terragrunt/env/**"
 
@@ -75,15 +75,18 @@ jobs:
         id: filter
         with:
           filters: |
+            cloudtrail:
+              - 'terragrunt/aws/cloudtrail/**'
+              - 'terragrunt/env/satellite/cloudtrail/**'
             config:
-              - 'terragrunt/aws/config/**' 
-              - 'terragrunt/env/satellite/config/**'             
-            s3:
-              - 'terragrunt/aws/satellite_bucket/**'  
-              - 'terragrunt/env/satellite/s3/**'     
+              - 'terragrunt/aws/config/**'
+              - 'terragrunt/env/satellite/config/**'
+            satellite_bucket:
+              - 'terragrunt/aws/satellite_bucket/**'
+              - 'terragrunt/env/satellite/satellite_bucket/**'
             common:
               - '.github/workflows/terragrunt-plan-satellite.yml'
-              - 'satellite_accounts.json'               
+              - 'satellite_accounts.json'
               - 'terragrunt/env/common/**'
               - 'terragrunt/env/terragrunt.hcl'
 
@@ -93,24 +96,35 @@ jobs:
           role-to-assume: arn:aws:iam::339850311124:role/ConfigTerraformAdministratorRole
           aws-region: 'ca-central-1'
 
+      - name: Terragrunt plan satellite bucket
+        if: ${{ steps.filter.outputs.satellite_bucket == 'true' || steps.filter.outputs.common == 'true' }}
+        uses: cds-snc/terraform-plan@v2
+        with:
+          directory: "terragrunt/env/satellite/satellite_bucket"
+          comment-delete: "true"
+          comment-title: "Satellite S3 bucket: ${{ matrix.account }}"
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          iam-role: "arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole"
+          terragrunt: "true"
+
+      - name: Terragrunt plan cloudtrail
+        if: ${{ steps.filter.outputs.cloudtrail == 'true' || steps.filter.outputs.common == 'true' }}
+        uses: cds-snc/terraform-plan@v2
+        with:
+          directory: "terragrunt/env/satellite/cloudtrail"
+          comment-delete: "true"
+          comment-title: "Satellite CloudTrail: ${{ matrix.account }}"
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          iam-role: "arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole"
+          terragrunt: "true"
+
       - name: Terragrunt plan config
         if: ${{ steps.filter.outputs.config == 'true' || steps.filter.outputs.common == 'true' }}
         uses: cds-snc/terraform-plan@v2
         with:
           directory: "terragrunt/env/satellite/config"
           comment-delete: "true"
-          comment-title: "Satellite account: ${{ matrix.account}}"
+          comment-title: "Satellite Config: ${{ matrix.account }}"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
-          iam-role: "arn:aws:iam::${{ matrix.account}}:role/ConfigTerraformAdminExecutionRole"
+          iam-role: "arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole"
           terragrunt: "true"
-
-      - name: Terragrunt plan s3
-        if: ${{ steps.filter.outputs.s3 == 'true' || steps.filter.outputs.common == 'true' }}
-        uses: cds-snc/terraform-plan@v2
-        with:
-          directory: "terragrunt/env/satellite/s3"
-          comment-delete: "true"
-          comment-title: "Satellite account: ${{ matrix.account}}"
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-          iam-role: "arn:aws:iam::${{ matrix.account}}:role/ConfigTerraformAdminExecutionRole"
-          terragrunt: "true"          
