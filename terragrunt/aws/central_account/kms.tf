@@ -1,7 +1,7 @@
 resource "aws_kms_key" "log_archive_encrypt" {
   description         = "Encrypt objects in the log-archive S3 bucket"
   enable_key_rotation = "true"
-  policy              = data.aws_iam_policy_document.log_archive_encrypt.json
+  policy              = sensitive(data.aws_iam_policy_document.log_archive_encrypt.json)
 }
 
 data "aws_iam_policy_document" "log_archive_encrypt" {
@@ -15,27 +15,36 @@ data "aws_iam_policy_document" "log_archive_encrypt" {
     resources = ["*"]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.account_id}:root"]
+      identifiers = [var.account_id]
+    }
+  }
+
+  # Allow CBS principal to decrypt using the key
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt"
+    ]
+    resources = ["*"]
+    principals {
+      type        = "AWS"
+      identifiers = [var.cbs_principal_arn]
     }
   }
 
   # Allow satellite accounts to use the key for encryption
-  dynamic "statement" {
-    for_each = var.satellite_account_ids
-
-    content {
-      effect = "Allow"
-      actions = [
-        "kms:Encrypt",
-        "kms:ReEncrypt*",
-        "kms:GenerateDataKey*",
-        "kms:DescribeKey"
-      ]
-      resources = ["*"]
-      principals {
-        type        = "AWS"
-        identifiers = ["arn:aws:iam::${statement.value}:root"]
-      }
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = ["*"]
+    principals {
+      type        = "AWS"
+      identifiers = local.trusted_replicate_role_arns
     }
   }
 }

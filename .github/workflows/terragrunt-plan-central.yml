@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
     # paths:
     #   - ".github/workflows/terragrunt-plan-central.yml"
+    #   - "satellite_accounts.json"    
     #   - "terragrunt/aws/**"
     #   - "terragrunt/env/**"
 
@@ -12,6 +13,7 @@ env:
   CONFTEST_VERSION: 0.27.0
   TERRAFORM_VERSION: 1.1.4
   TERRAGRUNT_VERSION: 0.36.0
+  TF_VAR_cbs_principal_arn: ${{ secrets.CBS_PRINCIPAL_ARN }}
 
 permissions:
   id-token: write
@@ -74,6 +76,7 @@ jobs:
               - 'terragrunt/env/central/central_account/**'    
             common:
               - '.github/workflows/terragrunt-plan-central.yml'
+              - 'satellite_accounts.json'               
               - 'terragrunt/env/common/**'
               - 'terragrunt/env/terragrunt.hcl'
 

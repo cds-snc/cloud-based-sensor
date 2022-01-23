@@ -1,3 +1,9 @@
+locals {
+  trusted_replicate_role_arns = [
+    for account_id in var.satellite_account_ids : "arn:aws:iam::${account_id}:role/${var.satellite_s3_replicate_role_name}"
+  ]
+}
+
 #
 # Log archive bucket and access logging
 #
@@ -43,41 +49,33 @@ resource "aws_s3_bucket_policy" "log_archive_bucket" {
 }
 
 data "aws_iam_policy_document" "log_archive_bucket" {
-  dynamic "statement" {
-    for_each = var.satellite_account_ids
-
-    content {
-      principals {
-        type        = "AWS"
-        identifiers = ["arn:aws:iam::${statement.value}:role/${var.satellite_s3_replicate_role_name}"]
-      }
-      actions = [
-        "s3:ObjectOwnerOverrideToBucketOwner",
-        "s3:ReplicateObject",
-        "s3:ReplicateDelete"
-      ]
-      resources = [
-        "${module.log_archive_bucket.s3_bucket_arn}/*",
-      ]
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = local.trusted_replicate_role_arns
     }
+    actions = [
+      "s3:ObjectOwnerOverrideToBucketOwner",
+      "s3:ReplicateObject",
+      "s3:ReplicateDelete"
+    ]
+    resources = [
+      "${module.log_archive_bucket.s3_bucket_arn}/*",
+    ]
   }
 
-  dynamic "statement" {
-    for_each = var.satellite_account_ids
-
-    content {
-      principals {
-        type        = "AWS"
-        identifiers = ["arn:aws:iam::${statement.value}:role/${var.satellite_s3_replicate_role_name}"]
-      }
-      actions = [
-        "s3:List*",
-        "s3:GetBucketVersioning",
-        "s3:PutBucketVersioning"
-      ]
-      resources = [
-        module.log_archive_bucket.s3_bucket_arn
-      ]
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = local.trusted_replicate_role_arns
     }
+    actions = [
+      "s3:List*",
+      "s3:GetBucketVersioning",
+      "s3:PutBucketVersioning"
+    ]
+    resources = [
+      module.log_archive_bucket.s3_bucket_arn
+    ]
   }
 }

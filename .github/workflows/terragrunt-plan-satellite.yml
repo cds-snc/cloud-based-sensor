@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
     # paths:
     #   - ".github/workflows/terragrunt-plan-satellite.yml"
+    #   - "satellite_accounts.json"    
     #   - "terragrunt/aws/**"
     #   - "terragrunt/env/**"
 
@@ -82,6 +83,7 @@ jobs:
               - 'terragrunt/env/satellite/s3/**'     
             common:
               - '.github/workflows/terragrunt-plan-satellite.yml'
+              - 'satellite_accounts.json'               
               - 'terragrunt/env/common/**'
               - 'terragrunt/env/terragrunt.hcl'
 
