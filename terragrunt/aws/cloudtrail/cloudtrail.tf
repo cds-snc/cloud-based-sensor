@@ -1,6 +1,7 @@
 locals {
   satellite_bucket_arn = "arn:aws:s3:::${var.satellite_bucket_name}"
   trail_prefix         = "cloudtrail_logs"
+  trail_arn            = "arn:aws:cloudtrail:${var.region}:${var.account_id}:trail/CbsSatelliteTrail"
 }
 
 #
@@ -18,6 +19,10 @@ resource "aws_cloudtrail" "satellite_trail" {
     (var.billing_tag_key) = var.billing_tag_value
     Terraform             = true
   }
+
+  depends_on = [
+    aws_s3_bucket_policy.satellite_trail
+  ]
 }
 
 #
@@ -61,7 +66,7 @@ data "aws_iam_policy_document" "satellite_trail" {
     condition {
       test     = "StringEquals"
       variable = "aws:SourceArn"
-      values   = [aws_cloudtrail.satellite_trail.arn]
+      values   = [local.trail_arn]
     }
   }
 }
