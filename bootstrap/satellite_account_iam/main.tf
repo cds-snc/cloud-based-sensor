@@ -1,3 +1,9 @@
+data "aws_caller_identity" "current" {}
+
+locals {
+  account_id = data.aws_caller_identity.current.account_id
+}
+
 # Assume role policy for the central cbs account to manage config rules via Terraform
 resource "aws_iam_role" "config_terraform_role" {
   name               = "ConfigTerraformAdminExecutionRole"
@@ -41,7 +47,7 @@ data "aws_iam_policy_document" "config_terraform_policy" {
     actions = [
       "dynamodb:*",
     ]
-    resources = ["arn:aws:dynamodb:${var.region}:${var.account_id}:table/tfstate-lock"]
+    resources = ["arn:aws:dynamodb:${var.region}:${local.account_id}:table/tfstate-lock"]
   }
 
   statement {
