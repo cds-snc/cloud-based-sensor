@@ -4,3 +4,8 @@ variable "config_max_execution_frequency" {
   default     = "TwentyFour_Hours"
   type        = string
 }
+
+variable "aws_waf_log_bucket" {
+  description = "S3 bucket to store WAF logs"
+  type        = string
+}
