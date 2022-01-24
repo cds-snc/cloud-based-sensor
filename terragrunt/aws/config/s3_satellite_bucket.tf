@@ -36,7 +36,7 @@ data "archive_file" "cbs_s3_satellite_bucket_rule" {
 
 resource "aws_lambda_function" "cbs_s3_satellite_bucket_rule" {
   filename      = "/tmp/cbs_s3_satellite_bucket_rule.zip"
-  function_name = "cbs_s3_satellite_bucket_rule"
+  function_name = "CbsS3SatelliteBucketRule"
   role          = aws_iam_role.cbs_s3_satellite_bucket_rule.arn
   handler       = "s3_satellite_bucket_rule.lambda_handler"
 
@@ -74,7 +74,7 @@ resource "aws_cloudwatch_log_group" "cbs_s3_satellite_bucket_rule" {
 # Lambda execution role
 #
 resource "aws_iam_role" "cbs_s3_satellite_bucket_rule" {
-  name               = "cbs_s3_satellite_bucket_rule"
+  name               = "CbsS3SatelliteBucketRule"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume.json
 
   tags = {
@@ -94,7 +94,7 @@ resource "aws_iam_role_policy_attachment" "cbs_s3_satellite_bucket_rule_s3_list_
 }
 
 resource "aws_iam_policy" "s3_list_buckets" {
-  name        = "s3_list_buckets"
+  name        = "CbsS3ListBuckets"
   path        = "/"
   description = "IAM policy for listing all S3 buckets"
   policy      = data.aws_iam_policy_document.s3_list_buckets.json
