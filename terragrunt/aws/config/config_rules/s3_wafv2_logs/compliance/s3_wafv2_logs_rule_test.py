@@ -55,7 +55,7 @@ class ComplianceTest(unittest.TestCase):
         )
         assert_successful_evaluation(self, response, resp_expected)
 
-    def test_compliant_config_change(self):
+    def test_compliant_config_change_s3(self):
         invoking_event = self.invoking_event_wafv2_config_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
         wafv2_mock(
@@ -66,7 +66,7 @@ class ComplianceTest(unittest.TestCase):
         resp_expected = build_expected_response("COMPLIANT", "wafv2-ca-central-1")
         assert_successful_evaluation(self, response, resp_expected)
 
-    def test_compliant_config_change(self):
+    def test_compliant_config_change_kinesis(self):
         invoking_event = self.invoking_event_wafv2_config_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
         wafv2_mock(
