@@ -158,19 +158,24 @@ def evaluate_compliance(configuration_item, event):
 
     required_logging_configs = ["arn:aws:s3", "arn:aws:kinesis"]
 
-    for webacl in response['WebACLs']:
-      log_config = wafv2.get_logging_configuration(ResourceArn=webacl["ARN"])
-      minimum_logged_enabled = False
+    for webacl in response["WebACLs"]:
+        log_config = wafv2.get_logging_configuration(ResourceArn=webacl["ARN"])
+        minimum_logged_enabled = False
 
-      for log_destination_configs in log_config["LoggingConfiguration"]["LogDestinationConfigs"]:
-        if "arn:aws:s3" in log_destination_configs or "arn:aws:kinesis" in log_destination_configs:
-          return build_evaluation(configuration_item, "COMPLIANT")
-      
-      return build_evaluation(
-          configuration_item,
-          "NON_COMPLIANT",
-          f'WAFv2 ACL is not configured to log to either S3 or Kinesis',
-      )
+        for log_destination_configs in log_config["LoggingConfiguration"][
+            "LogDestinationConfigs"
+        ]:
+            if (
+                "arn:aws:s3" in log_destination_configs
+                or "arn:aws:kinesis" in log_destination_configs
+            ):
+                return build_evaluation(configuration_item, "COMPLIANT")
+
+        return build_evaluation(
+            configuration_item,
+            "NON_COMPLIANT",
+            f"WAFv2 ACL is not configured to log to either S3 or Kinesis",
+        )
 
 
 def build_evaluation(configuration_item, compliance_type, annotation=None):

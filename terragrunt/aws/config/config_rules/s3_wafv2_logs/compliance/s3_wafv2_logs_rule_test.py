@@ -44,19 +44,24 @@ class ComplianceTest(unittest.TestCase):
     def test_non_compliant_config_change(self):
         invoking_event = self.invoking_event_wafv2_config_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
-        wafv2_mock([], {'ARN': "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"})
+        wafv2_mock(
+            [], {"ARN": "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"}
+        )
         response = RULE.lambda_handler(lambda_event, {})
         resp_expected = build_expected_response(
             "NON_COMPLIANT",
             "wafv2-ca-central-1",
-            annotation='WAFv2 ACL is not configured to log to either S3 or Kinesis',
+            annotation="WAFv2 ACL is not configured to log to either S3 or Kinesis",
         )
         assert_successful_evaluation(self, response, resp_expected)
 
     def test_compliant_config_change(self):
         invoking_event = self.invoking_event_wafv2_config_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
-        wafv2_mock(["arn:aws:s3:::aws-waf-logs-cbs-123456789012"], {'ARN': "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"})
+        wafv2_mock(
+            ["arn:aws:s3:::aws-waf-logs-cbs-123456789012"],
+            {"ARN": "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"},
+        )
         response = RULE.lambda_handler(lambda_event, {})
         resp_expected = build_expected_response("COMPLIANT", "wafv2-ca-central-1")
         assert_successful_evaluation(self, response, resp_expected)
@@ -64,7 +69,10 @@ class ComplianceTest(unittest.TestCase):
     def test_compliant_config_change(self):
         invoking_event = self.invoking_event_wafv2_config_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
-        wafv2_mock(["arn:aws:kinesis:::aws-waf-logs-cbs-123456789012"], {'ARN': "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"})
+        wafv2_mock(
+            ["arn:aws:kinesis:::aws-waf-logs-cbs-123456789012"],
+            {"ARN": "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"},
+        )
         response = RULE.lambda_handler(lambda_event, {})
         resp_expected = build_expected_response("COMPLIANT", "wafv2-ca-central-1")
         assert_successful_evaluation(self, response, resp_expected)
@@ -72,19 +80,24 @@ class ComplianceTest(unittest.TestCase):
     def test_non_compliant_periodic_change(self):
         invoking_event = self.invoking_event_wafv2_periodic_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
-        wafv2_mock([], {'ARN': "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"})
+        wafv2_mock(
+            [], {"ARN": "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"}
+        )
         response = RULE.lambda_handler(lambda_event, {})
         resp_expected = build_expected_response(
             "NON_COMPLIANT",
             "123456789012",
-            annotation='WAFv2 ACL is not configured to log to either S3 or Kinesis',
+            annotation="WAFv2 ACL is not configured to log to either S3 or Kinesis",
         )
         assert_successful_evaluation(self, response, resp_expected)
 
     def test_compliant_periodic_change(self):
         invoking_event = self.invoking_event_wafv2_periodic_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
-        wafv2_mock(["arn:aws:s3:::aws-waf-logs-cbs-123456789012"], {'ARN': "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"})
+        wafv2_mock(
+            ["arn:aws:s3:::aws-waf-logs-cbs-123456789012"],
+            {"ARN": "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"},
+        )
         response = RULE.lambda_handler(lambda_event, {})
         resp_expected = build_expected_response("COMPLIANT", "123456789012")
         assert_successful_evaluation(self, response, resp_expected)
@@ -139,10 +152,11 @@ def assert_successful_evaluation(test_class, response, resp_expected):
 
 
 def wafv2_mock(log=[], web_acl=[]):
-    get_logging_configuration = {"LoggingConfiguration": {'LogDestinationConfigs': log}}
-    list_web_acls = {"WebACLs": [{'ARN': web_acl}]}
+    get_logging_configuration = {"LoggingConfiguration": {"LogDestinationConfigs": log}}
+    list_web_acls = {"WebACLs": [{"ARN": web_acl}]}
 
     WAFV2_CLIENT_MOCK.reset_mock(return_value=True)
-    WAFV2_CLIENT_MOCK.get_logging_configuration = MagicMock(return_value=get_logging_configuration)
+    WAFV2_CLIENT_MOCK.get_logging_configuration = MagicMock(
+        return_value=get_logging_configuration
+    )
     WAFV2_CLIENT_MOCK.list_web_acls = MagicMock(return_value=list_web_acls)
-
