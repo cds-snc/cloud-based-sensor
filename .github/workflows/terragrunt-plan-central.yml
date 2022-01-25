@@ -15,6 +15,7 @@ env:
   TERRAFORM_VERSION: 1.1.4
   TERRAGRUNT_VERSION: 0.36.0
   TF_VAR_cbs_principal_arn: ${{ secrets.CBS_PRINCIPAL_ARN }}
+  TF_INPUT: false
 
 permissions:
   id-token: write
