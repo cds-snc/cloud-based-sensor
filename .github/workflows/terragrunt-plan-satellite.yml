@@ -88,6 +88,9 @@ jobs:
           role-to-assume: arn:aws:iam::339850311124:role/ConfigTerraformAdministratorRole
           aws-region: 'ca-central-1'
 
+      - name: Set the Terragrunt IAM role
+        run: echo "TERRAGRUNT_IAM_ROLE=arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole" >> $GITHUB_ENV
+
       - name: Terragrunt plan satellite bucket
         if: ${{ steps.filter.outputs.satellite_bucket == 'true' || steps.filter.outputs.common == 'true' }}
         uses: cds-snc/terraform-plan@v2
@@ -96,7 +99,6 @@ jobs:
           comment-delete: "true"
           comment-title: "Satellite S3 bucket: ${{ matrix.account }}"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
-          iam-role: "arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole"
           terragrunt: "true"
 
       - name: Terragrunt plan cloudtrail
@@ -107,7 +109,6 @@ jobs:
           comment-delete: "true"
           comment-title: "Satellite CloudTrail: ${{ matrix.account }}"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
-          iam-role: "arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole"
           terragrunt: "true"
 
       - name: Terragrunt plan config
@@ -118,5 +119,4 @@ jobs:
           comment-delete: "true"
           comment-title: "Satellite Config: ${{ matrix.account }}"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
-          iam-role: "arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole"
           terragrunt: "true"
