@@ -35,7 +35,7 @@ data "aws_iam_policy_document" "s3_replicate" {
       "s3:GetObjectVersionAcl"
     ]
     resources = [
-      "${module.satellite_bucket.s3_bucket_arn}/*"
+      "${module.satellite_bucket.s3_bucket_arn}/*",
     ]
   }
   statement {
@@ -46,7 +46,7 @@ data "aws_iam_policy_document" "s3_replicate" {
       "s3:ReplicateDelete"
     ]
     resources = [
-      "${local.log_archive_bucket_arn}/*"
+      "${local.log_archive_bucket_arn}/*",
     ]
   }
 }

@@ -43,10 +43,6 @@ resource "aws_config_remediation_configuration" "cbs_s3_bucket_logging_enabled" 
     name         = "GranteeUri"
     static_value = "http://acs.amazonaws.com/groups/s3/LogDelivery"
   }
-  parameter {
-    name         = "SSEAlgorithm"
-    static_value = "AES256"
-  }
 
   automatic                  = true
   maximum_automatic_attempts = 10
