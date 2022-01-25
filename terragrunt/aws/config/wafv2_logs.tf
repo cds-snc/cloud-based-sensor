@@ -131,7 +131,7 @@ resource "aws_cloudwatch_log_group" "cbs_default_kinesis_stream" {
   retention_in_days = 14
 
   tags = {
-    CostCentre = var.billing_code
+    CostCentre = var.billing_tag_value
     Terraform  = true
   }
 }
@@ -152,7 +152,7 @@ resource "aws_kinesis_firehose_delivery_stream" "cbs_default_stream" {
   }
 
   tags = {
-    CostCentre = var.billing_code
+    CostCentre = var.billing_tag_value
     Terraform  = true
   }
 }
@@ -170,7 +170,7 @@ resource "aws_iam_role" "waf_log_role" {
   assume_role_policy = data.aws_iam_policy_document.firehose_assume_role.json
 
   tags = {
-    CostCentre = var.billing_code
+    CostCentre = var.billing_tag_value
     Terraform  = true
   }
 }
@@ -181,7 +181,7 @@ resource "aws_iam_policy" "write_waf_logs" {
   policy      = data.aws_iam_policy_document.write_waf_logs.json
 
   tags = {
-    CostCentre = var.billing_code
+    CostCentre = var.billing_tag_value
     Terraform  = true
   }
 }

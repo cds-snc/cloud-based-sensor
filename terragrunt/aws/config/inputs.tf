@@ -4,9 +4,3 @@ variable "config_max_execution_frequency" {
   default     = "TwentyFour_Hours"
   type        = string
 }
-
-variable "billing_code" {
-  description = "The billing code to tag our resources with"
-  type        = string
-  default     = "cbs-central"
-}

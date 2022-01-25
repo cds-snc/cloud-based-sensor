@@ -47,7 +47,6 @@ data "aws_iam_policy_document" "s3_replicate" {
     ]
     resources = [
       "${local.log_archive_bucket_arn}/*",
-      "${module.satellite_bucket.s3_bucket_arn}/*"
     ]
   }
 }
