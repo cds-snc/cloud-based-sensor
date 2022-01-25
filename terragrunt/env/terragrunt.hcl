@@ -11,6 +11,7 @@ inputs = {
   log_archive_bucket_name            = "cbs-log-archive-${local.log_archive_account_id}"
   region                             = "ca-central-1"
   satellite_bucket_name              = "cbs-satellite-${get_aws_account_id()}"
+  aws_waf_log_bucket                 = "aws-waf-logs-cbs-${get_aws_account_id()}"
   satellite_s3_replicate_role_name   = "CbsSatelliteReplicateToLogArchive"
   satellite_account_ids              = split("\n", chomp(file("../../satellite_accounts.json")))
 }

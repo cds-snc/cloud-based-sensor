@@ -142,8 +142,8 @@ resource "aws_kinesis_firehose_delivery_stream" "cbs_default_stream" {
 
   extended_s3_configuration {
     role_arn   = aws_iam_role.waf_log_role.arn
-    prefix     = "waf/${var.account_id}/"
-    bucket_arn = module.waf_logs.s3_bucket_arn
+    prefix     = "waf_acl_logs/"
+    bucket_arn = "arn:aws:s3:::${var.satellite_bucket_name}"
     cloudwatch_logging_options {
       enabled         = true
       log_group_name  = aws_cloudwatch_log_group.cbs_default_kinesis_stream.name
@@ -157,23 +157,12 @@ resource "aws_kinesis_firehose_delivery_stream" "cbs_default_stream" {
   }
 }
 
-module "waf_logs" {
-  source            = "github.com/cds-snc/terraform-modules?ref=v1.0.4//S3"
-  bucket_name       = var.aws_waf_log_bucket
-  billing_tag_value = var.billing_tag_value
-
-  versioning = {
-    enabled = true
-  }
-
-  lifecycle_rule = [
-    {
-      enabled = true
-      expiration = {
-        days = 14
-      }
-    }
-  ]
+#
+# Attach policy to the Replication role created as part
+# of the `bootstrap/satellite_account_iam`.
+#
+data "aws_iam_role" "s3_replicate" {
+  name = "CbsSatelliteReplicateToLogArchive"
 }
 
 resource "aws_iam_role" "waf_log_role" {
@@ -224,7 +213,7 @@ data "aws_iam_policy_document" "write_waf_logs" {
     ]
 
     resources = [
-      module.waf_logs.s3_bucket_arn
+      "arn:aws:s3:::${var.satellite_bucket_name}"
     ]
   }
 
@@ -237,7 +226,7 @@ data "aws_iam_policy_document" "write_waf_logs" {
     ]
 
     resources = [
-      "${module.waf_logs.s3_bucket_arn}/waf/*"
+      "arn:aws:s3:::${var.satellite_bucket_name}/waf_acl_logs/*"
     ]
   }
 }

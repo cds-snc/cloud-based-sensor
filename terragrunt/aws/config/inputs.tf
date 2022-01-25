@@ -5,11 +5,6 @@ variable "config_max_execution_frequency" {
   type        = string
 }
 
-variable "aws_waf_log_bucket" {
-  description = "S3 bucket to store WAF logs"
-  type        = string
-}
-
 variable "billing_code" {
   description = "The billing code to tag our resources with"
   type        = string
