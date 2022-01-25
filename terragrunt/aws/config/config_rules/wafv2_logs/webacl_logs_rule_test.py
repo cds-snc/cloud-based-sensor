@@ -1,3 +1,4 @@
+import os
 import sys
 import unittest
 
@@ -9,6 +10,9 @@ except ImportError:
 
 # Define the default resource to report to Config Rules
 DEFAULT_RESOURCE_TYPE = "AWS::WAFv2::WebACL"
+os.environ[
+    "FIREHOSE_ARN"
+] = "arn:aws:firehose:ca-central-1:123456789012:deliverystream/aws-waf-logs-123456789012"
 
 CONFIG_CLIENT_MOCK = MagicMock()
 WAFV2_CLIENT_MOCK = MagicMock()
@@ -29,7 +33,7 @@ class Boto3Mock:
 
 sys.modules["boto3"] = Boto3Mock()
 
-RULE = __import__("s3_wafv2_logs_rule")
+RULE = __import__("webacl_logs_rule")
 
 
 class ComplianceTest(unittest.TestCase):
@@ -44,63 +48,61 @@ class ComplianceTest(unittest.TestCase):
     def test_non_compliant_config_change(self):
         invoking_event = self.invoking_event_wafv2_config_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
-        wafv2_mock(
-            [], {"ARN": "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"}
-        )
+        wafv2_mock([], "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl")
         response = RULE.lambda_handler(lambda_event, {})
         resp_expected = build_expected_response(
-            "NON_COMPLIANT",
-            "wafv2-ca-central-1",
-            annotation="WAFv2 ACL is not configured to log to either S3 or Kinesis",
+            "COMPLIANT", "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"
         )
-        assert_successful_evaluation(self, response, resp_expected)
+        assert_successful_evaluation(self, response[0], resp_expected)
 
     def test_compliant_config_change_s3(self):
         invoking_event = self.invoking_event_wafv2_config_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
         wafv2_mock(
             ["arn:aws:s3:::aws-waf-logs-cbs-123456789012"],
-            {"ARN": "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"},
+            "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl",
         )
         response = RULE.lambda_handler(lambda_event, {})
-        resp_expected = build_expected_response("COMPLIANT", "wafv2-ca-central-1")
-        assert_successful_evaluation(self, response, resp_expected)
+        resp_expected = build_expected_response(
+            "COMPLIANT", "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"
+        )
+        assert_successful_evaluation(self, response[0], resp_expected)
 
     def test_compliant_config_change_kinesis(self):
         invoking_event = self.invoking_event_wafv2_config_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
         wafv2_mock(
             ["arn:aws:kinesis:::aws-waf-logs-cbs-123456789012"],
-            {"ARN": "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"},
+            "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl",
         )
         response = RULE.lambda_handler(lambda_event, {})
-        resp_expected = build_expected_response("COMPLIANT", "wafv2-ca-central-1")
-        assert_successful_evaluation(self, response, resp_expected)
+        resp_expected = build_expected_response(
+            "COMPLIANT", "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"
+        )
+        assert_successful_evaluation(self, response[0], resp_expected)
 
     def test_non_compliant_periodic_change(self):
         invoking_event = self.invoking_event_wafv2_periodic_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
-        wafv2_mock(
-            [], {"ARN": "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"}
-        )
+        wafv2_mock([], "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl")
         response = RULE.lambda_handler(lambda_event, {})
         resp_expected = build_expected_response(
-            "NON_COMPLIANT",
-            "123456789012",
-            annotation="WAFv2 ACL is not configured to log to either S3 or Kinesis",
+            "COMPLIANT", "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"
         )
-        assert_successful_evaluation(self, response, resp_expected)
+        assert_successful_evaluation(self, response[0], resp_expected)
 
     def test_compliant_periodic_change(self):
         invoking_event = self.invoking_event_wafv2_periodic_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
         wafv2_mock(
             ["arn:aws:s3:::aws-waf-logs-cbs-123456789012"],
-            {"ARN": "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"},
+            "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl",
         )
         response = RULE.lambda_handler(lambda_event, {})
-        resp_expected = build_expected_response("COMPLIANT", "123456789012")
-        assert_successful_evaluation(self, response, resp_expected)
+        resp_expected = build_expected_response(
+            "COMPLIANT", "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"
+        )
+        assert_successful_evaluation(self, response[0], resp_expected)
 
 
 # Helper Functions
@@ -160,3 +162,4 @@ def wafv2_mock(log=[], web_acl=[]):
         return_value=get_logging_configuration
     )
     WAFV2_CLIENT_MOCK.list_web_acls = MagicMock(return_value=list_web_acls)
+    WAFV2_CLIENT_MOCK.put_logging_configuration = MagicMock()

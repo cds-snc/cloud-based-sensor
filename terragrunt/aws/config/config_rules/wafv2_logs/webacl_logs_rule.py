@@ -2,10 +2,14 @@ import boto3
 import botocore
 import datetime
 import json
+import os
+
+from copy import copy
 
 # Set to True to get the lambda to assume the Role attached on the Config Service (cross-account).
 ASSUME_ROLE_MODE = False
 DEFAULT_RESOURCE_TYPE = "AWS::WAFv2::WebACL"
+FIREHOSE_ARN = os.environ["FIREHOSE_ARN"]
 
 
 def lambda_handler(event, context):
@@ -20,7 +24,7 @@ def lambda_handler(event, context):
     evaluation = evaluate_compliance(configuration_item, event)
 
     AWS_CONFIG_CLIENT.put_evaluations(
-        Evaluations=[evaluation], ResultToken=event["resultToken"]
+        Evaluations=evaluation, ResultToken=event["resultToken"]
     )
 
     # Used for unit tests
@@ -154,25 +158,56 @@ def evaluate_compliance(configuration_item, event):
     check_defined(configuration_item, "configuration_item")
 
     wafv2 = get_client("wafv2", event)
-    response = wafv2.list_web_acls()
+    response = wafv2.list_web_acls(Scope="REGIONAL")
+
+    evaluations = []
 
     for webacl in response["WebACLs"]:
-        log_config = wafv2.get_logging_configuration(ResourceArn=webacl["ARN"])
+        current_item = copy(configuration_item)
+        current_item["resourceId"] = webacl["ARN"]
+        logging_enabled = False
 
-        for log_destination_configs in log_config["LoggingConfiguration"][
-            "LogDestinationConfigs"
-        ]:
+        try:
+            wafv2.get_logging_configuration(ResourceArn=webacl["ARN"])
+            logging_enabled = True
+        except botocore.exceptions.ClientError as e:
+
             if (
-                "arn:aws:s3" in log_destination_configs
-                or "arn:aws:kinesis" in log_destination_configs
-            ):
-                return build_evaluation(configuration_item, "COMPLIANT")
+                e.response["Error"]["Code"] == "WAFNonexistentItemException"
+            ):  # Logging not enabled
+                logging_enabled = False
+                pass
+            else:
+                evaluations.append(
+                    build_evaluation(
+                        current_item,
+                        "NON_COMPLIANT",
+                        "WAFv2 ACL is not configured to log to either S3 or Kinesis",
+                    )
+                )
+                continue
 
-        return build_evaluation(
-            configuration_item,
-            "NON_COMPLIANT",
-            "WAFv2 ACL is not configured to log to either S3 or Kinesis",
-        )
+        if not logging_enabled:
+            # Attempt to setup logging, otherwise flag as non-compliant for manual verification
+            try:
+                response = wafv2.put_logging_configuration(
+                    LoggingConfiguration={
+                        "ResourceArn": webacl["ARN"],
+                        "LogDestinationConfigs": [FIREHOSE_ARN],
+                    }
+                )
+            except botocore.exceptions.ClientError:
+                evaluations.append(
+                    build_evaluation(
+                        current_item,
+                        "NON_COMPLIANT",
+                        "WAFv2 ACL is not configured to log to either S3 or Kinesis",
+                    )
+                )
+                continue
+
+        evaluations.append(build_evaluation(current_item, "COMPLIANT"))
+    return evaluations
 
 
 def build_evaluation(configuration_item, compliance_type, annotation=None):

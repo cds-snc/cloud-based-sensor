@@ -53,3 +53,13 @@ terraform import aws_iam_role.config_terraform_role ConfigTerraformAdministrator
   "Resource": "*"
 }
 ```
+
+# Debugging
+
+### Auto remediation
+
+```bash
+aws configservice describe-remediation-execution-status \
+     --config-rule-name cbs_wafv2_logging_enabled \
+     --region ca-central-1  
+```

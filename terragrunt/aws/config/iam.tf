@@ -8,7 +8,7 @@ resource "aws_iam_policy_attachment" "managed_policy" {
   name = "aws_config_managed_policy"
   roles = [
     aws_iam_role.security_config.name,
-    aws_iam_role.cbs_s3_satellite_bucket_rule.name
+    aws_iam_role.cbs_s3_satellite_bucket_rule.name,
   ]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSConfigRole"
 }
