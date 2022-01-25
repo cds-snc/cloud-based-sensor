@@ -1,0 +1,52 @@
+name: "Compliance check"
+
+on:
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ca-central-1
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_CBS }}
+
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+  checks: write
+  statuses: write
+
+jobs:
+
+  retreive-accounts:
+    uses: cds-snc/cloud-based-sensor/.github/workflows/retrieve-accounts.yml@main
+
+  compliance-check:
+    needs: retreive-accounts
+    strategy:
+      fail-fast: false
+      matrix: ${{fromJson(needs.retrieve-accounts.outputs.matrix)}}
+
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          role-to-assume: arn:aws:iam::339850311124:role/ConfigTerraformAdministratorRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Check rule compliance
+        id: compliance
+        run: |
+          RULE_STATUS=$(aws configservice describe-compliance-by-config-rule \
+            --compliance-types NON_COMPLIANT \
+            --config-rule-names \
+              cbs_s3_satellite_bucket_rule \
+              cbs_s3_bucket_logging_enabled)
+          RULES=$(echo "$RULE_STATUS" | jq -r ".ComplianceByConfigRules")
+          echo "::set-output name=rules::$RULES"
+
+      - name: Post non-compliant slack message
+        if: steps.compliance.outputs.rules != '[]'
+        run: |
+          json="{'blocks':[{'type':'section','text':{'type':'mrkdwn','text':':red: `${{ matrix.account }}` ConfigRules are not compliant'}}]}"
+          curl -X POST -H 'Content-type: application/json' --data "$json" ${{ env.SLACK_WEBHOOK }}

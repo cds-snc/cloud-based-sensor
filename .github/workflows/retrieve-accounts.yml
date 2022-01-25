@@ -1,0 +1,26 @@
+name: "Retrieve accounts"
+
+# Retrieves the satellite account IDs in a structure that can be used
+# by a GitHub workflow matrix
+
+on:
+  workflow_call:
+    outputs:
+      matrix:
+        description: "The matrix of satellite accounts"
+        value: ${{ jobs.retrieve-accounts.outputs.matrix }}
+
+jobs:
+  retrieve-accounts:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Read account file
+        id: set-matrix
+        run: |
+          accounts=$(jq -n -c "{\"include\": [inputs | {"account": .} ] }"  satellite_accounts.json)
+          echo "::set-output name=matrix::$accounts"
