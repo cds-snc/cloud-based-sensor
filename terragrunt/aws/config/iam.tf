@@ -1,5 +1,5 @@
 resource "aws_iam_role" "security_config" {
-  name = "CbsConfigPolicy"
+  name               = "CbsConfigPolicy"
   assume_role_policy = data.aws_iam_policy_document.aws_config_assume_role_policy.json
 }
 

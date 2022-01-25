@@ -2,17 +2,19 @@ name: "Terragrunt plan"
 
 on:
   workflow_dispatch:
-    # paths:
-    #   - ".github/workflows/terragrunt-plan-satellite.yml"
-    #   - "satellite_accounts.json"
-    #   - "terragrunt/aws/**"
-    #   - "terragrunt/env/**"
+  pull_request:
+    paths:
+      - ".github/workflows/terragrunt-plan-satellite.yml"
+      - "satellite_accounts.json"
+      - "terragrunt/aws/**"
+      - "terragrunt/env/**"
 
 env:
   AWS_REGION: ca-central-1
   CONFTEST_VERSION: 0.27.0
   TERRAFORM_VERSION: 1.1.4
   TERRAGRUNT_VERSION: 0.36.0
+  TF_INPUT: false
 
 permissions:
   id-token: write
@@ -24,7 +26,7 @@ permissions:
 
 jobs:
 
-  retreive-accounts:
+  retrieve-accounts:
     uses: cds-snc/cloud-based-sensor/.github/workflows/retrieve-accounts.yml@main
 
   terragrunt-plan:
@@ -86,6 +88,9 @@ jobs:
           role-to-assume: arn:aws:iam::339850311124:role/ConfigTerraformAdministratorRole
           aws-region: 'ca-central-1'
 
+      - name: Set the Terragrunt IAM role
+        run: echo "TERRAGRUNT_IAM_ROLE=arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole" >> $GITHUB_ENV
+
       - name: Terragrunt plan satellite bucket
         if: ${{ steps.filter.outputs.satellite_bucket == 'true' || steps.filter.outputs.common == 'true' }}
         uses: cds-snc/terraform-plan@v2
@@ -94,7 +99,6 @@ jobs:
           comment-delete: "true"
           comment-title: "Satellite S3 bucket: ${{ matrix.account }}"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
-          iam-role: "arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole"
           terragrunt: "true"
 
       - name: Terragrunt plan cloudtrail
@@ -105,7 +109,6 @@ jobs:
           comment-delete: "true"
           comment-title: "Satellite CloudTrail: ${{ matrix.account }}"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
-          iam-role: "arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole"
           terragrunt: "true"
 
       - name: Terragrunt plan config
@@ -116,5 +119,4 @@ jobs:
           comment-delete: "true"
           comment-title: "Satellite Config: ${{ matrix.account }}"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
-          iam-role: "arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole"
           terragrunt: "true"
