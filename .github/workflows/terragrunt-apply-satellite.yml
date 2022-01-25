@@ -25,19 +25,9 @@ permissions:
   statuses: write
 
 jobs:
-  retrieve-accounts:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
 
-      - name: Read account file
-        id: set-matrix
-        run: |
-          accounts=$(jq -n -c "{\"include\": [inputs | {"account": .} ] }"  satellite_accounts.json)
-          echo "::set-output name=matrix::$accounts"
+  retreive-accounts:
+    uses: cds-snc/cloud-based-sensor/.github/workflows/retrieve-accounts.yml@main
 
   terragrunt-apply:
     needs: retrieve-accounts
