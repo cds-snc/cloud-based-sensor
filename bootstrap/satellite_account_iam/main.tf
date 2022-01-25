@@ -28,39 +28,13 @@ data "aws_iam_policy_document" "config_execution_role" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "config_terraform_policy" {
+data "aws_iam_policy" "admin" {
+  name = "AdministratorAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "admin" {
   role       = aws_iam_role.config_terraform_role.name
-  policy_arn = aws_iam_policy.config_terraform_policy.arn
-}
-
-resource "aws_iam_policy" "config_terraform_policy" {
-  name   = "cbs-config-terraform"
-  path   = "/"
-  policy = data.aws_iam_policy_document.config_terraform_policy.json
-}
-
-data "aws_iam_policy_document" "config_terraform_policy" {
-  statement {
-
-    effect = "Allow"
-
-    actions = [
-      "dynamodb:*",
-    ]
-    resources = ["arn:aws:dynamodb:${var.region}:${local.account_id}:table/tfstate-lock"]
-  }
-
-  statement {
-
-    effect = "Allow"
-
-    actions = [
-      "config:*",
-      "iam:*",
-      "s3:*",
-    ]
-    resources = ["*"]
-  }
+  policy_arn = data.aws_iam_policy.admin.arn
 }
 
 #
