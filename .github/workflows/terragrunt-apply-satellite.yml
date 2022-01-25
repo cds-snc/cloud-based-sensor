@@ -90,19 +90,22 @@ jobs:
           role-to-assume: arn:aws:iam::339850311124:role/ConfigTerraformAdministratorRole
           aws-region: 'ca-central-1'
 
+      - name: Set the Terragrunt IAM role
+        run: echo "TERRAGRUNT_IAM_ROLE=arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole" >> $GITHUB_ENV
+
       - name: Terragrunt apply satellite bucket
         if: ${{ steps.filter.outputs.satellite_bucket == 'true' || steps.filter.outputs.common == 'true' }}
         working-directory: "terragrunt/env/satellite/satellite_bucket"
-        run: terragrunt apply --terragrunt-non-interactive -auto-approve --terragrunt-iam-role "arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole"
+        run: terragrunt apply --terragrunt-non-interactive -auto-approve
 
       - name: Terragrunt apply cloudtrail
         if: ${{ steps.filter.outputs.cloudtrail == 'true' || steps.filter.outputs.common == 'true' }}
         working-directory: "terragrunt/env/satellite/cloudtrail"
-        run: terragrunt apply --terragrunt-non-interactive -auto-approve --terragrunt-iam-role "arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole"
+        run: terragrunt apply --terragrunt-non-interactive -auto-approve
 
       - name: Terragrunt apply config
         if: ${{ steps.filter.outputs.config == 'true' || steps.filter.outputs.common == 'true' }}
         working-directory: "terragrunt/env/satellite/config"
-        run: terragrunt apply --terragrunt-non-interactive -auto-approve --terragrunt-iam-role "arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole"
+        run: terragrunt apply --terragrunt-non-interactive -auto-approve
 
 
