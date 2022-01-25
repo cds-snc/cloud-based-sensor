@@ -35,7 +35,7 @@ data "archive_file" "cbs_wafv2_logs_rule" {
 
 resource "aws_lambda_function" "cbs_wafv2_logs_rule" {
   filename      = "/tmp/cbs_wafv2_logs_rule.zip"
-  function_name = "cbs_wafv2_logs_rule"
+  function_name = "cbs-wafv2-logs-rule"
   role          = aws_iam_role.cbs_wafv2_logs_rule.arn
   handler       = "webacl_logs_rule.lambda_handler"
 
@@ -79,7 +79,7 @@ resource "aws_cloudwatch_log_group" "cbs_wafv2_logs_rule" {
 # Lambda execution role
 #
 resource "aws_iam_role" "cbs_wafv2_logs_rule" {
-  name               = "cbs_wafv2_logs_rule"
+  name               = "cbs-wafv2-logs-rule"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume.json
 
   tags = {
@@ -99,7 +99,7 @@ resource "aws_iam_role_policy_attachment" "cbs_wafv2_logs_rule_wafv2_list_web_ac
 }
 
 resource "aws_iam_policy" "wafv2_list_web_acls" {
-  name        = "wafv2_list_web_acls"
+  name        = "cbs-wafv2-acls-policy"
   path        = "/"
   description = "IAM policy for listing all WAFv2 ACLs"
   policy      = data.aws_iam_policy_document.wafv2_list_web_acls.json
@@ -137,7 +137,7 @@ resource "aws_cloudwatch_log_group" "cbs_default_kinesis_stream" {
 }
 
 resource "aws_kinesis_firehose_delivery_stream" "cbs_default_stream" {
-  name        = "aws-waf-logs-${var.account_id}"
+  name        = "cbs-aws-waf-logs-${var.account_id}"
   destination = "extended_s3"
 
   extended_s3_configuration {
@@ -177,7 +177,7 @@ module "waf_logs" {
 }
 
 resource "aws_iam_role" "waf_log_role" {
-  name               = "${var.account_id}-logs"
+  name               = "cbs-${var.account_id}-logs"
   assume_role_policy = data.aws_iam_policy_document.firehose_assume_role.json
 
   tags = {
@@ -187,7 +187,7 @@ resource "aws_iam_role" "waf_log_role" {
 }
 
 resource "aws_iam_policy" "write_waf_logs" {
-  name        = "${var.account_id}_WriteLogs"
+  name        = "cbs-${var.account_id}-write-waf-logs"
   description = "Allow writing WAF logs to S3 + CloudWatch"
   policy      = data.aws_iam_policy_document.write_waf_logs.json
 
