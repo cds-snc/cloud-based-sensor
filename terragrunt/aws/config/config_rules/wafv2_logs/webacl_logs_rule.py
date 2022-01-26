@@ -2,14 +2,12 @@ import boto3
 import botocore
 import datetime
 import json
-import os
 
 from copy import copy
 
 # Set to True to get the lambda to assume the Role attached on the Config Service (cross-account).
 ASSUME_ROLE_MODE = False
 DEFAULT_RESOURCE_TYPE = "AWS::WAFv2::WebACL"
-FIREHOSE_ARN = os.environ["FIREHOSE_ARN"]
 
 
 def lambda_handler(event, context):
@@ -165,48 +163,20 @@ def evaluate_compliance(configuration_item, event):
     for webacl in response["WebACLs"]:
         current_item = copy(configuration_item)
         current_item["resourceId"] = webacl["ARN"]
-        logging_enabled = False
 
         try:
             wafv2.get_logging_configuration(ResourceArn=webacl["ARN"])
-            logging_enabled = True
-        except botocore.exceptions.ClientError as e:
-
-            if (
-                e.response["Error"]["Code"] == "WAFNonexistentItemException"
-            ):  # Logging not enabled
-                logging_enabled = False
-                pass
-            else:
-                evaluations.append(
-                    build_evaluation(
-                        current_item,
-                        "NON_COMPLIANT",
-                        "WAFv2 ACL is not configured to log to either S3 or Kinesis",
-                    )
+        except botocore.exceptions.ClientError:
+            evaluations.append(
+                build_evaluation(
+                    current_item,
+                    "NON_COMPLIANT",
+                    "WAFv2 ACL is not configured to log to either S3 or Kinesis",
                 )
-                continue
-
-        if not logging_enabled:
-            # Attempt to setup logging, otherwise flag as non-compliant for manual verification
-            try:
-                response = wafv2.put_logging_configuration(
-                    LoggingConfiguration={
-                        "ResourceArn": webacl["ARN"],
-                        "LogDestinationConfigs": [FIREHOSE_ARN],
-                    }
-                )
-            except botocore.exceptions.ClientError:
-                evaluations.append(
-                    build_evaluation(
-                        current_item,
-                        "NON_COMPLIANT",
-                        "WAFv2 ACL is not configured to log to either S3 or Kinesis",
-                    )
-                )
-                continue
-
+            )
+            continue
         evaluations.append(build_evaluation(current_item, "COMPLIANT"))
+
     return evaluations
 
 
@@ -217,10 +187,12 @@ def build_evaluation(configuration_item, compliance_type, annotation=None):
     annotation -- an annotation to be added to the evaluation (default None)
     """
     eval_cc = {}
+
     if annotation:
         eval_cc["Annotation"] = annotation
     eval_cc["ComplianceResourceType"] = configuration_item["resourceType"]
     eval_cc["ComplianceResourceId"] = configuration_item["resourceId"]
     eval_cc["ComplianceType"] = compliance_type
     eval_cc["OrderingTimestamp"] = configuration_item["configurationItemCaptureTime"]
+
     return eval_cc
