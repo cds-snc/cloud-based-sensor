@@ -3,6 +3,8 @@ import botocore
 import datetime
 import json
 
+from copy import copy
+
 # Set to True to get the lambda to assume the Role attached on the Config Service (cross-account).
 ASSUME_ROLE_MODE = False
 DEFAULT_RESOURCE_TYPE = "AWS::S3::Bucket"
@@ -159,11 +161,14 @@ def evaluate_compliance(configuration_item, event):
     rule_parameters = json.loads(event["ruleParameters"])
     bucket_name = rule_parameters["satelliteBucket"]
 
+    current_item = copy(configuration_item)
+    current_item["resourceId"] = bucket_name
+
     if any(b["Name"] == bucket_name for b in response["Buckets"]):
-        return build_evaluation(configuration_item, "COMPLIANT")
+        return build_evaluation(current_item, "COMPLIANT")
     else:
         return build_evaluation(
-            configuration_item,
+            current_item,
             "NON_COMPLIANT",
             f'The "{bucket_name}" bucket does not exist',
         )

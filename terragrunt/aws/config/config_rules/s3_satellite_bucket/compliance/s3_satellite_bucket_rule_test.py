@@ -48,7 +48,7 @@ class ComplianceTest(unittest.TestCase):
         response = RULE.lambda_handler(lambda_event, {})
         resp_expected = build_expected_response(
             "NON_COMPLIANT",
-            "s3-ca-central-1",
+            "cbs-central-satellite-123456789012",
             annotation='The "cbs-central-satellite-123456789012" bucket does not exist',
         )
         assert_successful_evaluation(self, response, resp_expected)
@@ -58,7 +58,9 @@ class ComplianceTest(unittest.TestCase):
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
         s3_mock([{"Name": "cbs-central-satellite-123456789012"}])
         response = RULE.lambda_handler(lambda_event, {})
-        resp_expected = build_expected_response("COMPLIANT", "s3-ca-central-1")
+        resp_expected = build_expected_response(
+            "COMPLIANT", "cbs-central-satellite-123456789012"
+        )
         assert_successful_evaluation(self, response, resp_expected)
 
     def test_non_compliant_periodic_change(self):
@@ -68,7 +70,7 @@ class ComplianceTest(unittest.TestCase):
         response = RULE.lambda_handler(lambda_event, {})
         resp_expected = build_expected_response(
             "NON_COMPLIANT",
-            "123456789012",
+            "cbs-central-satellite-123456789012",
             annotation='The "cbs-central-satellite-123456789012" bucket does not exist',
         )
         assert_successful_evaluation(self, response, resp_expected)
@@ -78,7 +80,9 @@ class ComplianceTest(unittest.TestCase):
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
         s3_mock([{"Name": "cbs-central-satellite-123456789012"}])
         response = RULE.lambda_handler(lambda_event, {})
-        resp_expected = build_expected_response("COMPLIANT", "123456789012")
+        resp_expected = build_expected_response(
+            "COMPLIANT", "cbs-central-satellite-123456789012"
+        )
         assert_successful_evaluation(self, response, resp_expected)
 
 
