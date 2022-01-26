@@ -16,11 +16,11 @@ permissions:
 
 jobs:
 
-  retreive-accounts:
+  retrieve-accounts:
     uses: cds-snc/cloud-based-sensor/.github/workflows/retrieve-accounts.yml@main
 
   compliance-check:
-    needs: retreive-accounts
+    needs: retrieve-accounts
     strategy:
       fail-fast: false
       matrix: ${{fromJson(needs.retrieve-accounts.outputs.matrix)}}
@@ -33,10 +33,20 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::339850311124:role/ConfigTerraformAdministratorRole
           aws-region: ${{ env.AWS_REGION }}
+          role-duration-seconds: 900
 
       - name: Check rule compliance
         id: compliance
         run: |
+          # Assume satellite account role
+          export $(printf "AWS_ACCESS_KEY_ID=%s AWS_SECRET_ACCESS_KEY=%s AWS_SESSION_TOKEN=%s" \
+            $(aws sts assume-role \
+              --role-arn arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole \
+              --role-session-name SatelliteAccountSession \
+              --duration-seconds 900 \
+              --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" \
+              --output text))
+
           RULE_STATUS=$(aws configservice describe-compliance-by-config-rule \
             --compliance-types NON_COMPLIANT \
             --config-rule-names \
@@ -48,5 +58,5 @@ jobs:
       - name: Post non-compliant slack message
         if: steps.compliance.outputs.rules != '[]'
         run: |
-          json="{'blocks':[{'type':'section','text':{'type':'mrkdwn','text':':red: `${{ matrix.account }}` ConfigRules are not compliant'}}]}"
+          json='{"text": ":red: `${{ matrix.account }}` ConfigRules are not compliant"}'
           curl -X POST -H 'Content-type: application/json' --data "$json" ${{ env.SLACK_WEBHOOK }}
