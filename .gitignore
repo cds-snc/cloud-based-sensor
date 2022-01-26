@@ -3,7 +3,7 @@ __pycache__
 
 terraform.tfstate*
 
-*.lock.hcl
+bootstrap/**/*.lock.hcl
 **/.terragrunt-cache
 **/.terraform
 
