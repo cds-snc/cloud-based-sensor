@@ -145,6 +145,7 @@ data "aws_iam_policy_document" "policy" {
   statement {
     effect = "Allow"
     actions = [
+      "config:PutEvaluations",
       "s3:GetBucketLogging",
       "s3:ListAllMyBuckets"
     ]
