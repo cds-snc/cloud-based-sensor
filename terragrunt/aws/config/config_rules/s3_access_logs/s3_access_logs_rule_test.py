@@ -104,6 +104,19 @@ class ComplianceTest(unittest.TestCase):
         )
         assert_successful_evaluation(self, response[0], resp_expected)
 
+    def test_non_applicable_access_bucket_config_change(self):
+        invoking_event = self.invoking_event_bucket_config_change
+        lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
+        s3_mock(
+            "",
+            [{"Name": "cbs-satellite-account-bucket123456789012-access"}],
+        )
+        response = RULE.lambda_handler(lambda_event, {})
+        resp_expected = build_expected_response(
+            "NOT_APPLICABLE", "cbs-satellite-account-bucket123456789012-access"
+        )
+        assert_successful_evaluation(self, response[0], resp_expected)
+
 
 # Helper Functions
 
