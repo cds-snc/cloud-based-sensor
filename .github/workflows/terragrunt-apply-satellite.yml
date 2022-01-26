@@ -7,7 +7,7 @@ on:
       - main
     paths:
       - ".github/workflows/terragrunt-apply-satellite.yml"
-      - "satellite_accounts.json"
+      - "satellite_accounts"
       - "terragrunt/aws/**"
       - "terragrunt/env/**"
 
@@ -80,7 +80,7 @@ jobs:
               - 'terragrunt/env/satellite/satellite_bucket/**'
             common:
               - '.github/workflows/terragrunt-apply-satellite.yml'
-              - 'satellite_accounts.json'
+              - 'satellite_accounts'
               - 'terragrunt/env/common/**'
               - 'terragrunt/env/terragrunt.hcl'
 

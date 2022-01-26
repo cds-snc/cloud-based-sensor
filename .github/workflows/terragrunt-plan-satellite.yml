@@ -5,7 +5,7 @@ on:
   pull_request:
     paths:
       - ".github/workflows/terragrunt-plan-satellite.yml"
-      - "satellite_accounts.json"
+      - "satellite_accounts"
       - "terragrunt/aws/**"
       - "terragrunt/env/**"
 
@@ -78,7 +78,7 @@ jobs:
               - 'terragrunt/env/satellite/satellite_bucket/**'
             common:
               - '.github/workflows/terragrunt-plan-satellite.yml'
-              - 'satellite_accounts.json'
+              - 'satellite_accounts'
               - 'terragrunt/env/common/**'
               - 'terragrunt/env/terragrunt.hcl'
 
