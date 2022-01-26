@@ -1,11 +1,11 @@
-name: "Terragrunt plan"
+name: "Terragrunt plan central"
 
 on:
   workflow_dispatch:
   pull_request:
     paths:
       - ".github/workflows/terragrunt-plan-central.yml"
-      - "satellite_accounts.json"    
+      - "satellite_accounts"    
       - "terragrunt/aws/**"
       - "terragrunt/env/**"
 
@@ -65,7 +65,7 @@ jobs:
               - 'terragrunt/env/central/central_account/**'    
             common:
               - '.github/workflows/terragrunt-plan-central.yml'
-              - 'satellite_accounts.json'               
+              - 'satellite_accounts'               
               - 'terragrunt/env/common/**'
               - 'terragrunt/env/terragrunt.hcl'
 

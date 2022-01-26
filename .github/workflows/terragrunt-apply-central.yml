@@ -1,4 +1,4 @@
-name: "Terragrunt apply central account"
+name: "Terragrunt apply central"
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
       - main
     paths:
       - ".github/workflows/terragrunt-apply-central.yml"
-      - "satellite_accounts.json"
+      - "satellite_accounts"
       - "terragrunt/aws/**"
       - "terragrunt/env/**"
 
@@ -67,7 +67,7 @@ jobs:
               - 'terragrunt/env/central/central_account/**'    
             common:
               - '.github/workflows/terragrunt-apply-central.yml'
-              - 'satellite_accounts.json'              
+              - 'satellite_accounts'              
               - 'terragrunt/env/common/**'
               - 'terragrunt/env/terragrunt.hcl'
 
