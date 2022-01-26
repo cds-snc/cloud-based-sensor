@@ -30,7 +30,7 @@ resource "aws_config_config_rule" "cbs_s3_satellite_bucket_rule" {
 #
 data "archive_file" "cbs_s3_satellite_bucket_rule" {
   type        = "zip"
-  source_file = "config_rules/s3_satellite_bucket/compliance/s3_satellite_bucket_rule.py"
+  source_file = "config_rules/s3_satellite_bucket/s3_satellite_bucket_rule.py"
   output_path = "/tmp/cbs_s3_satellite_bucket_rule.zip"
 }
 
