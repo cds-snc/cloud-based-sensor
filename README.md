@@ -42,13 +42,13 @@ cbs-log-archive-bucket/
 # Setup
 We use a bootstrap pattern to onboard new accounts so that we can create the OpenID Connect IAM roles that are used by our [Terraform GitHub Actions](./.github/workflows).  The following is only required once per account.
 
-# Central account
+## Central account
 1. Export an AWS access key for the central account.
 1. Run [`./bootstrap/central_account_iam/bootstrap.sh`](./bootstrap/central_account_iam/bootstrap.sh)
 1. Run `terragrunt init` in [`./terragrunt/env/central/central_account`](./terragrunt/env/central/central_account)
 1. Import the bootstrapped role with `terragrunt import aws_iam_role.config_terraform_role ConfigTerraformAdministratorRole`
 
-# Satellite account
+## Satellite account
 1. Export an AWS access key for the satellite account.
 1. Run [`./bootstrap/satellite_account_iam/bootstrap.sh`](./bootstrap/satellite_account_iam/bootstrap.sh).
 1. Create a Pull Request with the new account ID added to [`./satellite_accounts`](./satellite_accounts).
