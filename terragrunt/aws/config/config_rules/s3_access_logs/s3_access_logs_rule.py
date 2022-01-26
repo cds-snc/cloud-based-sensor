@@ -167,7 +167,10 @@ def evaluate_compliance(configuration_item, event):
         current_item = copy(configuration_item)
         current_item["resourceId"] = bucket["Name"]
 
-        if bucket["Name"] == logging_bucket_name:
+        if (
+            bucket["Name"] == logging_bucket_name
+            or bucket["Name"] == f"{logging_bucket_name}-access"
+        ):
             evaluations.append(build_evaluation(current_item, "NOT_APPLICABLE"))
             continue
 
