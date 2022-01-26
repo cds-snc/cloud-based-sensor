@@ -145,7 +145,7 @@ data "aws_iam_policy_document" "policy" {
   statement {
     effect = "Allow"
     actions = [
-      "s3:GetReplicationConfiguration",
+      "s3:GetBucketLogging",
       "s3:ListAllMyBuckets"
     ]
     resources = ["*"]
