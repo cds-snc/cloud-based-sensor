@@ -38,14 +38,13 @@ class ComplianceTest(unittest.TestCase):
     invoking_event_bucket_periodic_change = '{"awsAccountId":"123456789012","notificationCreationTime":"2016-07-13T21:50:00.373Z","messageType":"ScheduledNotification","recordVersion":"1.0"}'
     rule_parameters = '{"targetBucket":"cbs-satellite-account-bucket123456789012"}'
 
-
     def setUp(self):
         pass
 
     def test_non_compliant_config_change(self):
         invoking_event = self.invoking_event_bucket_config_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
-        s3_mock([],[{"Name": "random-bucket-123456789012"}])
+        s3_mock([], [{"Name": "random-bucket-123456789012"}])
         response = RULE.lambda_handler(lambda_event, {})
         resp_expected = build_expected_response(
             "NON_COMPLIANT",
@@ -57,15 +56,20 @@ class ComplianceTest(unittest.TestCase):
     def test_compliant_config_change(self):
         invoking_event = self.invoking_event_bucket_config_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
-        s3_mock("cbs-satellite-account-bucket123456789012", [{"Name": "random-bucket-123456789012"}])
+        s3_mock(
+            "cbs-satellite-account-bucket123456789012",
+            [{"Name": "random-bucket-123456789012"}],
+        )
         response = RULE.lambda_handler(lambda_event, {})
-        resp_expected = build_expected_response("COMPLIANT", "random-bucket-123456789012")
+        resp_expected = build_expected_response(
+            "COMPLIANT", "random-bucket-123456789012"
+        )
         assert_successful_evaluation(self, response[0], resp_expected)
 
     def test_non_compliant_periodic_change(self):
         invoking_event = self.invoking_event_bucket_periodic_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
-        s3_mock([],[{"Name": "random-bucket-123456789012"}])
+        s3_mock([], [{"Name": "random-bucket-123456789012"}])
         response = RULE.lambda_handler(lambda_event, {})
         resp_expected = build_expected_response(
             "NON_COMPLIANT",
@@ -77,17 +81,27 @@ class ComplianceTest(unittest.TestCase):
     def test_compliant_periodic_change(self):
         invoking_event = self.invoking_event_bucket_periodic_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
-        s3_mock("cbs-satellite-account-bucket123456789012", [{"Name": "random-bucket-123456789012"}])
+        s3_mock(
+            "cbs-satellite-account-bucket123456789012",
+            [{"Name": "random-bucket-123456789012"}],
+        )
         response = RULE.lambda_handler(lambda_event, {})
-        resp_expected = build_expected_response("COMPLIANT", "random-bucket-123456789012")
+        resp_expected = build_expected_response(
+            "COMPLIANT", "random-bucket-123456789012"
+        )
         assert_successful_evaluation(self, response[0], resp_expected)
 
     def test_non_applicable_config_change(self):
         invoking_event = self.invoking_event_bucket_config_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
-        s3_mock("cbs-satellite-account-bucket123456789012", [{"Name": "cbs-satellite-account-bucket123456789012"}])
+        s3_mock(
+            "cbs-satellite-account-bucket123456789012",
+            [{"Name": "cbs-satellite-account-bucket123456789012"}],
+        )
         response = RULE.lambda_handler(lambda_event, {})
-        resp_expected = build_expected_response("NOT_APPLICABLE", "cbs-satellite-account-bucket123456789012")
+        resp_expected = build_expected_response(
+            "NOT_APPLICABLE", "cbs-satellite-account-bucket123456789012"
+        )
         assert_successful_evaluation(self, response[0], resp_expected)
 
 

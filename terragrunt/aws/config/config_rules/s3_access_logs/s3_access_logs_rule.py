@@ -164,25 +164,26 @@ def evaluate_compliance(configuration_item, event):
     evaluations = []
 
     for bucket in buckets_list["Buckets"]:
-      current_item = copy(configuration_item)
-      current_item["resourceId"] = bucket["Name"]
+        current_item = copy(configuration_item)
+        current_item["resourceId"] = bucket["Name"]
 
-      if bucket["Name"] == logging_bucket_name:
-        evaluations.append(build_evaluation(current_item, "NOT_APPLICABLE"))
-        continue
+        if bucket["Name"] == logging_bucket_name:
+            evaluations.append(build_evaluation(current_item, "NOT_APPLICABLE"))
+            continue
 
-      response = s3.get_bucket_logging(Bucket=bucket["Name"])
-      if "LoggingEnabled" in response:
-          if response["LoggingEnabled"]["TargetBucket"] == logging_bucket_name:
-              evaluations.append(build_evaluation(current_item, "COMPLIANT"))
-              continue
-              
+        response = s3.get_bucket_logging(Bucket=bucket["Name"])
+        if "LoggingEnabled" in response:
+            if response["LoggingEnabled"]["TargetBucket"] == logging_bucket_name:
+                evaluations.append(build_evaluation(current_item, "COMPLIANT"))
+                continue
 
-      evaluations.append(build_evaluation(
-          current_item,
-          "NON_COMPLIANT",
-          f'The "{bucket["Name"]}" bucket is not logging to {logging_bucket_name}',
-      ))
+        evaluations.append(
+            build_evaluation(
+                current_item,
+                "NON_COMPLIANT",
+                f'The "{bucket["Name"]}" bucket is not logging to {logging_bucket_name}',
+            )
+        )
 
     return evaluations
 
