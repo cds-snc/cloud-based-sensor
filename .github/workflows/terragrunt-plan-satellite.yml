@@ -1,4 +1,4 @@
-name: "Terragrunt plan"
+name: "Terragrunt plan satellite"
 
 on:
   workflow_dispatch:
@@ -97,7 +97,7 @@ jobs:
         with:
           directory: "terragrunt/env/satellite/satellite_bucket"
           comment-delete: "true"
-          comment-title: "Satellite S3 bucket: ${{ matrix.account }}"
+          comment-title: "${{ matrix.account }}: Satellite bucket"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           terragrunt: "true"
 
@@ -107,7 +107,7 @@ jobs:
         with:
           directory: "terragrunt/env/satellite/cloudtrail"
           comment-delete: "true"
-          comment-title: "Satellite CloudTrail: ${{ matrix.account }}"
+          comment-title: "${{ matrix.account }}: CloudTrail"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           terragrunt: "true"
 
@@ -117,6 +117,6 @@ jobs:
         with:
           directory: "terragrunt/env/satellite/config"
           comment-delete: "true"
-          comment-title: "Satellite Config: ${{ matrix.account }}"
+          comment-title: "${{ matrix.account }}: ConfigRules"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           terragrunt: "true"

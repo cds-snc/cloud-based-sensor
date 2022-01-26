@@ -1,4 +1,4 @@
-name: "Terragrunt apply central account"
+name: "Terragrunt apply central"
 
 on:
   workflow_dispatch:

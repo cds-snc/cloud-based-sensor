@@ -1,4 +1,4 @@
-name: "Terragrunt apply satellite accounts"
+name: "Terragrunt apply satellite"
 
 on:
   workflow_dispatch:

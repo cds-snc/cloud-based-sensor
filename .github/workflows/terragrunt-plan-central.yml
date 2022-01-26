@@ -1,4 +1,4 @@
-name: "Terragrunt plan"
+name: "Terragrunt plan central"
 
 on:
   workflow_dispatch:
