@@ -118,7 +118,6 @@ data "aws_iam_policy_document" "wafv2_list_web_acls" {
       "wafv2:GetLoggingConfiguration",
       "wafv2:ListWebACLs",
       "wafv2:ListLoggingConfigurations",
-      "wafv2:PutLoggingConfiguration",
       "config:PutEvaluations",
       "iam:CreateServiceLinkedRole",
     ]

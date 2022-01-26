@@ -1,6 +1,7 @@
-import os
 import sys
 import unittest
+
+from botocore.exceptions import ClientError
 
 try:
     from unittest.mock import MagicMock
@@ -10,9 +11,6 @@ except ImportError:
 
 # Define the default resource to report to Config Rules
 DEFAULT_RESOURCE_TYPE = "AWS::WAFv2::WebACL"
-os.environ[
-    "FIREHOSE_ARN"
-] = "arn:aws:firehose:ca-central-1:123456789012:deliverystream/aws-waf-logs-123456789012"
 
 CONFIG_CLIENT_MOCK = MagicMock()
 WAFV2_CLIENT_MOCK = MagicMock()
@@ -48,10 +46,12 @@ class ComplianceTest(unittest.TestCase):
     def test_non_compliant_config_change(self):
         invoking_event = self.invoking_event_wafv2_config_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
-        wafv2_mock([], "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl")
+        wafv2_mock([], "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl", True)
         response = RULE.lambda_handler(lambda_event, {})
         resp_expected = build_expected_response(
-            "COMPLIANT", "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"
+            "NON_COMPLIANT",
+            "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl",
+            annotation="WAFv2 ACL is not configured to log to either S3 or Kinesis",
         )
         assert_successful_evaluation(self, response[0], resp_expected)
 
@@ -84,10 +84,12 @@ class ComplianceTest(unittest.TestCase):
     def test_non_compliant_periodic_change(self):
         invoking_event = self.invoking_event_wafv2_periodic_change
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
-        wafv2_mock([], "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl")
+        wafv2_mock([], "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl", True)
         response = RULE.lambda_handler(lambda_event, {})
         resp_expected = build_expected_response(
-            "COMPLIANT", "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl"
+            "NON_COMPLIANT",
+            "arn:aws:wafv2:ca-central-1:123456789012:regional/webacl",
+            annotation="WAFv2 ACL is not configured to log to either S3 or Kinesis",
         )
         assert_successful_evaluation(self, response[0], resp_expected)
 
@@ -153,13 +155,19 @@ def assert_successful_evaluation(test_class, response, resp_expected):
         test_class.assertEqual(resp_expected["Annotation"], response["Annotation"])
 
 
-def wafv2_mock(log=[], web_acl=[]):
+def wafv2_mock(log=[], web_acl=[], generate_error=False):
     get_logging_configuration = {"LoggingConfiguration": {"LogDestinationConfigs": log}}
     list_web_acls = {"WebACLs": [{"ARN": web_acl}]}
 
     WAFV2_CLIENT_MOCK.reset_mock(return_value=True)
-    WAFV2_CLIENT_MOCK.get_logging_configuration = MagicMock(
-        return_value=get_logging_configuration
-    )
+
+    if generate_error:
+        WAFV2_CLIENT_MOCK.get_logging_configuration = MagicMock()
+        WAFV2_CLIENT_MOCK.get_logging_configuration.side_effect = ClientError(
+            {}, "error"
+        )
+    else:
+        WAFV2_CLIENT_MOCK.get_logging_configuration = MagicMock(
+            return_value=get_logging_configuration
+        )
     WAFV2_CLIENT_MOCK.list_web_acls = MagicMock(return_value=list_web_acls)
-    WAFV2_CLIENT_MOCK.put_logging_configuration = MagicMock()
