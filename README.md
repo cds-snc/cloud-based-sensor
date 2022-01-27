@@ -8,8 +8,29 @@ Infrastructure to support the Canadian Centre for Cyber Security (CCCS) Cloud Ba
 
 This repo uses Terraform and Terragrunt to define and manage the satellite and central account AWS resources.
 
-# CBS logging strucuture
+# Config rules
+This project sets up [AWS managed and custom Lambda ConfigRules](./terragrunt/aws/config) to check that:
 
+* the expected CBS resource exist; and
+* logs are being sent to the satellite bucket.
+
+The [`compliance-check.yml`](.github/workflows/compliance-check.yml) is then used to notify us when rules are non-compliant.  This will be switched to an SNS topic and subscription.
+
+# Setup
+We use a bootstrap pattern to onboard new accounts so that we can create the OpenID Connect IAM roles that are used by our [Terraform GitHub Actions](./.github/workflows).  The following is only required once per account.
+
+## Central account
+1. Export an AWS access key for the central account.
+1. Run [`./bootstrap/central_account_iam/bootstrap.sh`](./bootstrap/central_account_iam/bootstrap.sh)
+1. Run `terragrunt init` in [`./terragrunt/env/central/central_account`](./terragrunt/env/central/central_account)
+1. Import the bootstrapped role with `terragrunt import aws_iam_role.config_terraform_role ConfigTerraformAdministratorRole`
+
+## Satellite account
+1. Export an AWS access key for the satellite account.
+1. Run [`./bootstrap/satellite_account_iam/bootstrap.sh`](./bootstrap/satellite_account_iam/bootstrap.sh).
+1. Create a Pull Request with the new account ID added to [`./satellite_accounts`](./satellite_accounts).
+
+# Log archive structure
 ```
 cbs-log-archive-bucket/
 ├─ [aws_account_id]/
@@ -33,32 +54,4 @@ cbs-log-archive-bucket/
 │  │  ├─ [account_id]/
 │  │  │  ├─ file_1
 │  │  │  ├─ ...
-```
-
-# Config rules
-* [`s3_satellite_bucket`](./terragrunt/aws/config/s3_satellite_bucket.tf): Checks that an account has the expected CBS s3 satellite bucket.
-* [`s3_access_logs`](./terragrunt/aws/config/s3_access_logs.tf): Checks that all s3 buckets are replicating to the expected CBS s3 satellite bucket.
-
-# Setup
-We use a bootstrap pattern to onboard new accounts so that we can create the OpenID Connect IAM roles that are used by our [Terraform GitHub Actions](./.github/workflows).  The following is only required once per account.
-
-## Central account
-1. Export an AWS access key for the central account.
-1. Run [`./bootstrap/central_account_iam/bootstrap.sh`](./bootstrap/central_account_iam/bootstrap.sh)
-1. Run `terragrunt init` in [`./terragrunt/env/central/central_account`](./terragrunt/env/central/central_account)
-1. Import the bootstrapped role with `terragrunt import aws_iam_role.config_terraform_role ConfigTerraformAdministratorRole`
-
-## Satellite account
-1. Export an AWS access key for the satellite account.
-1. Run [`./bootstrap/satellite_account_iam/bootstrap.sh`](./bootstrap/satellite_account_iam/bootstrap.sh).
-1. Create a Pull Request with the new account ID added to [`./satellite_accounts`](./satellite_accounts).
-
-# Debugging
-
-### Auto remediation
-
-```bash
-aws configservice describe-remediation-execution-status \
-  --config-rule-name rule_name \
-  --region ca-central-1
 ```
