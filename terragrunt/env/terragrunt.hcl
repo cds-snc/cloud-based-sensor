@@ -12,7 +12,7 @@ inputs = {
   region                             = "ca-central-1"
   satellite_bucket_name              = "cbs-satellite-${get_aws_account_id()}"
   satellite_s3_replicate_role_name   = "CbsSatelliteReplicateToLogArchive"
-  satellite_account_ids              = split("\n", chomp(file("../../satellite_accounts")))
+  satellite_account_ids              = split("\n", chomp(replace(file("../../satellite_accounts"),"\"","")))
 }
 
 remote_state {

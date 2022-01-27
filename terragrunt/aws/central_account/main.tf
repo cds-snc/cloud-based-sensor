@@ -16,7 +16,7 @@ module "gh_oidc_roles" {
       claim     = "*"
     }
   ]
-  assume_policy     = data.aws_iam_policy_document.service_principal.json
+  assume_policy     = sensitive(data.aws_iam_policy_document.service_principal.json)
   billing_tag_value = var.billing_tag_value
 }
 
