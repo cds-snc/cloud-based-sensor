@@ -93,7 +93,9 @@ jobs:
           aws-region: 'ca-central-1'
 
       - name: Set the Terragrunt IAM role
-        run: echo "TERRAGRUNT_IAM_ROLE=arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole" >> $GITHUB_ENV
+        run: |
+          echo "TERRAGRUNT_IAM_ROLE=arn:aws:iam::${{ matrix.account }}:role/ConfigTerraformAdminExecutionRole" >> $GITHUB_ENV
+          echo "TERRAGRUNT_IAM_ASSUME_ROLE_SESSION_NAME=CBSGitHubActions" >> $GITHUB_ENV
 
       - name: Terragrunt plan satellite bucket
         if: ${{ steps.filter.outputs.satellite_bucket == 'true' || steps.filter.outputs.common == 'true' }}

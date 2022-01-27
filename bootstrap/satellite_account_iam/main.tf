@@ -23,7 +23,15 @@ data "aws_iam_policy_document" "config_execution_role" {
 
     principals {
       type        = "AWS"
-      identifiers = ["${var.central_account_id}"]
+      identifiers = ["arn:aws:iam::${var.central_account_id}:role/ConfigTerraformAdministratorRole"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "sts:RoleSessionName"
+      values = [
+        "CBSGitHubActions",
+      ]
     }
   }
 }
