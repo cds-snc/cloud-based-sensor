@@ -32,6 +32,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@master
         with:
           role-to-assume: arn:aws:iam::339850311124:role/ConfigTerraformAdministratorRole
+          role-session-name: CBSGitHubActions
           aws-region: ${{ env.AWS_REGION }}
           role-duration-seconds: 900
 
