@@ -1,6 +1,6 @@
 locals {
   vars                   = read_terragrunt_config("../env_vars.hcl")
-  log_archive_account_id = "339850311124"
+  log_archive_account_id = "871282759583"
 }
 
 inputs = {

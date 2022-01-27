@@ -1,7 +1,7 @@
 variable "central_account_id" {
   description = "(Required) The account ID to centrally manage all accounts."
   type        = string
-  default     = "339850311124"
+  default     = "871282759583"
 }
 
 variable "region" {
