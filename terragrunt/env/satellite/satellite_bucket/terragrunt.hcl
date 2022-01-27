@@ -3,7 +3,7 @@ terraform {
 }
 
 inputs = {
-  log_archive_kms_key_arn = "arn:aws:kms:ca-central-1:339850311124:key/02bf26d4-b787-485e-91de-c36e5f0fcd91"
+  log_archive_kms_key_arn = "arn:aws:kms:ca-central-1:871282759583:key/c4591f87-9445-4840-acb6-a5569e703c93"
 }
 
 include {

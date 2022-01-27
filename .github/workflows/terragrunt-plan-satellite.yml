@@ -89,7 +89,7 @@ jobs:
       - name: configure aws credentials using OIDC
         uses: aws-actions/configure-aws-credentials@master
         with:
-          role-to-assume: arn:aws:iam::339850311124:role/ConfigTerraformAdministratorRole
+          role-to-assume: arn:aws:iam::871282759583:role/ConfigTerraformAdministratorRole
           role-session-name: CBSGitHubActions
           aws-region: 'ca-central-1'
 
