@@ -1,30 +1,4 @@
 #
-# Config Rule
-#
-resource "aws_config_config_rule" "cbs_wafv2_logs_rule" {
-  name        = "cbs_wafv2_logs_rule"
-  description = "Checks that the WAFV2 ACL's are logging to either S3 or Kinesis."
-
-  source {
-    owner             = "CUSTOM_LAMBDA"
-    source_identifier = aws_lambda_function.cbs_wafv2_logs_rule.arn
-
-    source_detail {
-      message_type                = "ScheduledNotification"
-      maximum_execution_frequency = var.config_max_execution_frequency
-    }
-  }
-
-  scope {
-    compliance_resource_types = ["AWS::WAFv2::WebACL"]
-  }
-
-  depends_on = [
-    aws_lambda_permission.cbs_wafv2_logs_rule,
-  ]
-}
-
-#
 # Lambda function used by the ConfigRule
 #
 data "archive_file" "cbs_wafv2_logs_rule" {

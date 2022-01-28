@@ -48,16 +48,10 @@ jobs:
               --query "Credentials.[AccessKeyId,SecretAccessKey,SessionToken]" \
               --output text))
 
-          RULE_STATUS=$(aws configservice describe-compliance-by-config-rule \
-            --compliance-types NON_COMPLIANT \
-            --config-rule-names \
-              cbs_cloudtrail_enabled \
-              cbs_elb_logging_enabled \
-              cbs_s3_satellite_bucket_rule \
-              cbs_s3_bucket_logging_enabled \
-              cbs_wafv2_logs_rule \
-              cbs_vpc_flow_logging_enabled)
-          RULES=$(echo "$RULE_STATUS" | jq -r ".ComplianceByConfigRules")
+          RULE_STATUS=$(aws configservice describe-conformance-pack-compliance \
+            --conformance-pack-name cloud-based-sensor \
+            --filters ComplianceType="NON_COMPLIANT")
+          RULES=$(echo "$RULE_STATUS" | jq -r ".ConformancePackRuleComplianceList")
           echo "::set-output name=rules::$RULES"
 
       - name: Post non-compliant slack message

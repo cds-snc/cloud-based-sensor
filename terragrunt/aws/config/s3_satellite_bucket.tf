@@ -1,31 +1,4 @@
 #
-# Config Rule
-#
-resource "aws_config_config_rule" "cbs_s3_satellite_bucket_rule" {
-  name             = "cbs_s3_satellite_bucket_rule"
-  description      = "Checks that the CBS satellite bucket exists in the account."
-  input_parameters = jsonencode({ "satelliteBucket" = var.satellite_bucket_name })
-
-  source {
-    owner             = "CUSTOM_LAMBDA"
-    source_identifier = aws_lambda_function.cbs_s3_satellite_bucket_rule.arn
-
-    source_detail {
-      message_type                = "ScheduledNotification"
-      maximum_execution_frequency = var.config_max_execution_frequency
-    }
-  }
-
-  scope {
-    compliance_resource_types = ["AWS::S3::Bucket"]
-  }
-
-  depends_on = [
-    aws_lambda_permission.cbs_s3_satellite_bucket_rule,
-  ]
-}
-
-#
 # Lambda function used by the ConfigRule
 #
 data "archive_file" "cbs_s3_satellite_bucket_rule" {
