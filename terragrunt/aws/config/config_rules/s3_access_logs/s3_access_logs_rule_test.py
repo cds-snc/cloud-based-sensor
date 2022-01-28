@@ -109,11 +109,27 @@ class ComplianceTest(unittest.TestCase):
         lambda_event = build_lambda_event(invoking_event, self.rule_parameters)
         s3_mock(
             "",
-            [{"Name": "cbs-satellite-account-bucket123456789012-access"}],
+            [{"Name": "some-access-log-bucket"}],
+            [
+                {
+                    "Grantee": {
+                        "Type": "Group",
+                        "URI": "http://acs.amazonaws.com/groups/s3/LogDelivery",
+                    },
+                    "Permission": "WRITE",
+                },
+                {
+                    "Grantee": {
+                        "Type": "Group",
+                        "URI": "http://acs.amazonaws.com/groups/s3/LogDelivery",
+                    },
+                    "Permission": "READ_ACP",
+                },
+            ],
         )
         response = RULE.lambda_handler(lambda_event, {})
         resp_expected = build_expected_response(
-            "NOT_APPLICABLE", "cbs-satellite-account-bucket123456789012-access"
+            "NOT_APPLICABLE", "some-access-log-bucket"
         )
         assert_successful_evaluation(self, response[0], resp_expected)
 
@@ -166,11 +182,22 @@ def assert_successful_evaluation(test_class, response, resp_expected):
         test_class.assertEqual(resp_expected["Annotation"], response["Annotation"])
 
 
-def s3_mock(target_bucket, buckets):
+def s3_mock(target_bucket, buckets, bucket_acl_grants=[]):
     list_buckets = {"Buckets": buckets}
     get_bucket_logging = {
         "LoggingEnabled": {"TargetBucket": target_bucket, "TargetPrefix": ""}
     }
+    get_bucket_acl = {
+        "Owner": {"ID": "some-id"},
+        "Grants": [
+            {
+                "Grantee": {"ID": "another-id", "Type": "CanonicalUser"},
+                "Permission": "FULL_CONTROL",
+            }
+        ],
+    }
+    get_bucket_acl["Grants"].extend(bucket_acl_grants)
     S3_CLIENT_MOCK.reset_mock(return_value=True)
     S3_CLIENT_MOCK.get_bucket_logging = MagicMock(return_value=get_bucket_logging)
+    S3_CLIENT_MOCK.get_bucket_acl = MagicMock(return_value=get_bucket_acl)
     S3_CLIENT_MOCK.list_buckets = MagicMock(return_value=list_buckets)
