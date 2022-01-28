@@ -1,22 +1,3 @@
-resource "aws_config_config_rule" "cbs_s3_bucket_logging_enabled" {
-  name             = "cbs_s3_bucket_logging_enabled"
-  description      = "A Config rule that checks whether logging to the cbs satellite is enabled for your S3 buckets."
-  input_parameters = jsonencode({ "targetBucket" = var.satellite_bucket_name })
-
-  source {
-    owner             = "CUSTOM_LAMBDA"
-    source_identifier = aws_lambda_function.cbs_s3_access_logs_rule.arn
-
-    source_detail {
-      message_type                = "ScheduledNotification"
-      maximum_execution_frequency = var.config_max_execution_frequency
-    }
-  }
-  scope {
-    compliance_resource_types = ["AWS::S3::Bucket"]
-  }
-}
-
 #
 # Lambda function used by the ConfigRule
 #
