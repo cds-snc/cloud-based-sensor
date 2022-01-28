@@ -167,13 +167,22 @@ def evaluate_compliance(configuration_item, event):
         current_item = copy(configuration_item)
         current_item["resourceId"] = bucket["Name"]
 
-        if (
-            bucket["Name"] == logging_bucket_name
-            or bucket["Name"] == f"{logging_bucket_name}-access"
+        # Satellite bucket should not log
+        if bucket["Name"] == logging_bucket_name:
+            evaluations.append(build_evaluation(current_item, "NOT_APPLICABLE"))
+            continue
+
+        # S3 access log buckets with the `log-delivery-write` ACL should not log
+        response = s3.get_bucket_acl(Bucket=bucket["Name"])
+        if any(
+            grant["Grantee"].get("URI", "")
+            == "http://acs.amazonaws.com/groups/s3/LogDelivery"
+            for grant in response.get("Grants", [])
         ):
             evaluations.append(build_evaluation(current_item, "NOT_APPLICABLE"))
             continue
 
+        # All other buckets must have logging enabled
         response = s3.get_bucket_logging(Bucket=bucket["Name"])
         if "LoggingEnabled" in response:
             if response["LoggingEnabled"]["TargetBucket"] == logging_bucket_name:
