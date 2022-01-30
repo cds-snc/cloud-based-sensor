@@ -32,16 +32,15 @@ RUN curl -sL https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWS_CLI_VERS
     && unzip awscliv2.zip \
     && aws/install \
     && rm -rf \
-    awscliv2.zip \
-    aws \
-    /usr/local/aws-cli/v2/*/dist/aws_completer \
-    /usr/local/aws-cli/v2/*/dist/awscli/data/ac.index \
-    /usr/local/aws-cli/v2/*/dist/awscli/examples
+        awscliv2.zip \
+        aws \
+        /usr/local/aws-cli/v2/*/dist/awscli/examples
     
 # Setup aliases and autocomplete
 RUN echo "\n\
 complete -C /usr/bin/aws_completer aws\n\
 complete -C /usr/local/bin/terraform terraform\n\
+complete -C /usr/local/bin/aws_completer aws\n\
 alias tf='terraform'\n\
 alias tg='terragrunt'\n\
 alias ll='la -la'" >> /home/"${USERNAME}"/.zshrc
