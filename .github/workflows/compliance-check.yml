@@ -61,3 +61,7 @@ jobs:
         run: |
           json='{"text": ":red: `${{ matrix.account }}` has resources that are not compliant"}'
           curl -X POST -H 'Content-type: application/json' --data "$json" ${{ env.SLACK_WEBHOOK }}
+
+      - name: ${{ matrix.account }} is not compliant
+        if: steps.compliance.outputs.rules != '[]'
+        run: exit 1
