@@ -1,14 +1,13 @@
 ### AWS permissions required
-Compliance check retrieves the replication configuration of a s3 bucket to check if it's replicating to the satellite bucket with name `cbs-satellite-account-bucket${AWS_ACCOUNT_ID}`.
+Compliance check to ensure S3 buckets are sending access logs to the `cbs-satellite-${AWS_ACCOUNT_ID}` bucket.
 ```json
 {
   "Effect": "Allow",
-  "Action": "s3:GetReplicationConfiguration",
-  "Resource": "arn:aws:s3:::*"
-},
-{
-  "Effect": "Allow",
-  "Action": "s3:ListAllMyBuckets",
+  "Action": [
+    "s3:GetBucketAcl",
+    "s3:GetBucketLogging",
+    "s3:ListAllMyBuckets"
+  ],
   "Resource": "arn:aws:s3:::*"
 }
 ```

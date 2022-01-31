@@ -16,12 +16,6 @@ resource "aws_lambda_function" "cbs_wafv2_logs_rule" {
   source_code_hash = data.archive_file.cbs_wafv2_logs_rule.output_base64sha256
   runtime          = "python3.9"
 
-  environment {
-    variables = {
-      FIREHOSE_ARN = aws_kinesis_firehose_delivery_stream.cbs_default_stream.arn
-    }
-  }
-
   tracing_config {
     mode = "PassThrough"
   }
@@ -96,110 +90,5 @@ data "aws_iam_policy_document" "wafv2_list_web_acls" {
       "iam:CreateServiceLinkedRole",
     ]
     resources = ["*"]
-  }
-}
-
-resource "aws_cloudwatch_log_group" "cbs_default_kinesis_stream" {
-  name              = "/aws/kinesisfirehose/cbs_default_kinesis_stream"
-  retention_in_days = 14
-
-  tags = {
-    CostCentre = var.billing_tag_value
-    Terraform  = true
-  }
-}
-
-resource "aws_kinesis_firehose_delivery_stream" "cbs_default_stream" {
-  name        = "cbs-aws-waf-logs-${var.account_id}"
-  destination = "extended_s3"
-
-  extended_s3_configuration {
-    role_arn   = aws_iam_role.waf_log_role.arn
-    prefix     = "waf_acl_logs/"
-    bucket_arn = "arn:aws:s3:::${var.satellite_bucket_name}"
-    cloudwatch_logging_options {
-      enabled         = true
-      log_group_name  = aws_cloudwatch_log_group.cbs_default_kinesis_stream.name
-      log_stream_name = "WAFLogS3Delivery"
-    }
-  }
-
-  tags = {
-    CostCentre = var.billing_tag_value
-    Terraform  = true
-  }
-}
-
-#
-# Attach policy to the Replication role created as part
-# of the `bootstrap/satellite_account_iam`.
-#
-data "aws_iam_role" "s3_replicate" {
-  name = "CbsSatelliteReplicateToLogArchive"
-}
-
-resource "aws_iam_role" "waf_log_role" {
-  name               = "cbs-${var.account_id}-logs"
-  assume_role_policy = data.aws_iam_policy_document.firehose_assume_role.json
-
-  tags = {
-    CostCentre = var.billing_tag_value
-    Terraform  = true
-  }
-}
-
-resource "aws_iam_policy" "write_waf_logs" {
-  name        = "cbs-${var.account_id}-write-waf-logs"
-  description = "Allow writing WAF logs to S3 + CloudWatch"
-  policy      = data.aws_iam_policy_document.write_waf_logs.json
-
-  tags = {
-    CostCentre = var.billing_tag_value
-    Terraform  = true
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "write_waf_logs" {
-  role       = aws_iam_role.waf_log_role.name
-  policy_arn = aws_iam_policy.write_waf_logs.arn
-}
-
-data "aws_iam_policy_document" "firehose_assume_role" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["firehose.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
-}
-
-data "aws_iam_policy_document" "write_waf_logs" {
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "s3:ListBucket",
-    ]
-
-    resources = [
-      "arn:aws:s3:::${var.satellite_bucket_name}"
-    ]
-  }
-
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "s3:GetObject*",
-      "s3:PutObject*",
-    ]
-
-    resources = [
-      "arn:aws:s3:::${var.satellite_bucket_name}/waf_acl_logs/*"
-    ]
   }
 }
