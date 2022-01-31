@@ -16,12 +16,6 @@ resource "aws_lambda_function" "cbs_wafv2_logs_rule" {
   source_code_hash = data.archive_file.cbs_wafv2_logs_rule.output_base64sha256
   runtime          = "python3.9"
 
-  environment {
-    variables = {
-      FIREHOSE_ARN = aws_kinesis_firehose_delivery_stream.cbs_default_stream.arn
-    }
-  }
-
   tracing_config {
     mode = "PassThrough"
   }
