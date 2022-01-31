@@ -3,9 +3,13 @@ set -euo pipefail
 IFS=$'\n\t'
 
 #
+# PURPOSE:
 # Bootstraps a given satellite account's IAM roles.
 # This is based on the AWS access key and secret that
 # is currently exported. 
+#
+# USE:
+# ./bootstrap.sh 
 #
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
