@@ -41,25 +41,33 @@ terragrunt import \
 # Log archive structure
 ```
 cbs-log-archive-bucket/
-├─ [aws_account_id]/
-│  ├─ [cloudtrail_logs]/
-│  │  ├─ [trail_name]/
-│  │  │  ├─ file_1
+├─ [cloudtrail_logs]/
+│  ├─ [AWSLogs]/
+│  │  ├─ [aws_account_id]
+│  │  │  ├─ file
 │  │  │  ├─ ...
-│  ├─ [elb_logs]/
-│  │  ├─ [elb_name]/
-│  │  │  ├─ file_1
+│  │  │  
+├─ [elb_logs]/
+│  ├─ [AWSLogs]/
+│  │  ├─ [aws_account_id]
+│  │  │  ├─ file
 │  │  │  ├─ ...
-│  ├─ [s3_access_logs]/
-│  │  ├─ [bucket_name]/
-│  │  │  ├─ file_1
+│  │  │  
+├─ [s3_access_logs]/
+│  ├─ [AWSLogs]/
+│  │  ├─ [aws_account_id]
+│  │  │  ├─ file
 │  │  │  ├─ ...
-│  ├─ [vpc_flow_logs]/
-│  │  ├─ [vpc_id]/
-│  │  │  ├─ file_1
+│  │  │  
+├─ [vpc_flow_logs]/
+│  ├─ [AWSLogs]/
+│  │  ├─ [aws_account_id]
+│  │  │  ├─ file
 │  │  │  ├─ ...
-│  ├─ [waf_acl_logs]/
-│  │  ├─ [account_id]/
-│  │  │  ├─ file_1
+│  │  │  
+├─ [waf_acl_logs]/
+│  ├─ [AWSLogs]/
+│  │  ├─ [aws_account_id]
+│  │  │  ├─ file
 │  │  │  ├─ ...
 ```
