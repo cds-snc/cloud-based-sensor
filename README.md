@@ -21,9 +21,17 @@ We use a bootstrap pattern to onboard new accounts so that we can create the Ope
 
 ## Central account
 1. Export an AWS access key for the central account.
-1. Run [`./bootstrap/central_account_iam/bootstrap.sh`](./bootstrap/central_account_iam/bootstrap.sh)
-1. Run `terragrunt init` in [`./terragrunt/env/central/central_account`](./terragrunt/env/central/central_account)
-1. Import the bootstrapped role with `terragrunt import aws_iam_role.config_terraform_role ConfigTerraformAdministratorRole`
+1. Run [`./bootstrap/central_account_iam/bootstrap.sh`](./bootstrap/central_account_iam/bootstrap.sh).
+1. Run `terragrunt init` in [`./terragrunt/env/central/central_account`](./terragrunt/env/central/central_account).
+1. Import the bootstrapped role and IAM identity provider to the Terraform state:
+```sh
+terragrunt import \
+    module.gh_oidc_roles.aws_iam_role.this[0] \
+    ConfigTerraformAdministratorRole
+terragrunt import \
+    module.gh_oidc_roles.aws_iam_openid_connect_provider.github \
+    ${GITHUB_OIDC_PROVIDER_ARN}
+```
 
 ## Satellite account
 1. Export an AWS access key for the satellite account.
