@@ -47,7 +47,7 @@ cbs-log-archive-bucket/
 │  │  │  ├─ file
 │  │  │  ├─ ...
 │  │  │  
-├─ [elb_logs]/
+├─ [lb_logs]/
 │  ├─ [AWSLogs]/
 │  │  ├─ [aws_account_id]
 │  │  │  ├─ file
