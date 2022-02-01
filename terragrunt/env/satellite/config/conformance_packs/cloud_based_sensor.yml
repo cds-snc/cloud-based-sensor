@@ -35,23 +35,6 @@ Resources:
         Owner: AWS
         SourceIdentifier: ELB_LOGGING_ENABLED
     Type: AWS::Config::ConfigRule
-  S3BucketLoggingEnabled:
-    Properties:
-      ConfigRuleName: cbs_s3_bucket_logging_enabled
-      Description: A Config rule that checks whether logging to the cbs satellite is enabled for your S3 buckets.
-      InputParameters:
-        targetBucket: ${satellite_logging_bucket}
-      Scope:
-        ComplianceResourceTypes:
-          - AWS::S3::Bucket
-      Source:
-        Owner: CUSTOM_LAMBDA
-        SourceDetails:
-          - EventSource: aws.config
-            MaximumExecutionFrequency: TwentyFour_Hours
-            MessageType: ScheduledNotification
-        SourceIdentifier: ${cbs_s3_access_logs_rule_lambda_arn}
-    Type: AWS::Config::ConfigRule
   S3SatelliteBucket:
     Properties:
       ConfigRuleName: cbs_s3_satellite_bucket_rule
