@@ -53,12 +53,6 @@ cbs-log-archive-bucket/
 │  │  │  ├─ file
 │  │  │  ├─ ...
 │  │  │  
-├─ [s3_access_logs]/
-│  ├─ [AWSLogs]/
-│  │  ├─ [aws_account_id]
-│  │  │  ├─ file
-│  │  │  ├─ ...
-│  │  │  
 ├─ [vpc_flow_logs]/
 │  ├─ [AWSLogs]/
 │  │  ├─ [aws_account_id]
