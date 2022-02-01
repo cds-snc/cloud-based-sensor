@@ -26,7 +26,7 @@ Resources:
   ElbLoggingEnabled:
     Properties:
       ConfigRuleName: cbs_elb_logging_enabled
-      Description: Checks that the CBS satellite bucket exists in the account.
+      Description: A Config rule that checks whether load balancer logging is enabled
       Scope:
         ComplianceResourceTypes:
           - AWS::ElasticLoadBalancing::LoadBalancer
