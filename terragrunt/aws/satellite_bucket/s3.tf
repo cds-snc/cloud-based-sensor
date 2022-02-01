@@ -80,8 +80,7 @@ data "aws_iam_policy_document" "combined" {
     data.aws_iam_policy_document.cloudtrail_write_logs.json,
     data.aws_iam_policy_document.log_delivery_write_logs.json,
     data.aws_iam_policy_document.load_balancer_write_logs.json,
-    data.aws_iam_policy_document.deny_insecure_transport.json,
-    data.aws_iam_policy_document.allow_s3_access_logging.json
+    data.aws_iam_policy_document.deny_insecure_transport.json
   ]
 }
 
@@ -228,24 +227,5 @@ data "aws_iam_policy_document" "deny_insecure_transport" {
         "false"
       ]
     }
-  }
-}
-
-data "aws_iam_policy_document" "allow_s3_access_logging" {
-
-  statement {
-    sid    = "S3AccessLogging"
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["logging.s3.amazonaws.com"]
-    }
-    actions = [
-      "s3:PutObject",
-      "s3:PutObjectAcl"
-    ]
-    resources = [
-      "${module.satellite_bucket.s3_bucket_arn}/s3_access_logs/*"
-    ]
   }
 }
