@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "log_archive_read_assume" {
 }
 
 resource "aws_iam_policy" "log_archive_read" {
-  name   = "CbsLogArchiveBucketRead"
+  name   = "CbsASEAReaderRole"
   path   = "/"
   policy = data.aws_iam_policy_document.log_archive_read.json
 }
