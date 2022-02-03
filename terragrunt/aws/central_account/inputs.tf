@@ -3,3 +3,8 @@ variable "cbs_principal_arn" {
   type        = string
   sensitive   = true
 }
+
+variable "cbs_transport_lambda_name" {
+  description = "Name of the CBS transport Lambda function"
+  type        = string
+}
