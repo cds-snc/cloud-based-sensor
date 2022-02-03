@@ -88,9 +88,10 @@ data "aws_lambda_function" "cbs_transport_lambda" {
 }
 
 resource "aws_s3_bucket_notification" "cbs_transport_lambda" {
-  bucket = aws_s3_bucket.log_archive_bucket.id
+  bucket = module.log_archive_bucket.s3_bucket_id
 
   lambda_function {
+    id                  = "CbsEvent"
     lambda_function_arn = data.aws_lambda_function.cbs_transport_lambda.arn
     events              = ["s3:ObjectCreated:*"]
   }
