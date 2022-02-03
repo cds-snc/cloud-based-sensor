@@ -22,7 +22,7 @@ jobs:
       - name: Checkov security scan
         uses: bridgecrewio/checkov-action@8d1675bd19257514c72879a34c5dfe108d0d3028 # latest as of Jan 19, 2022
         with:
-          directory: aws
+          directory: terragrunt/aws
           framework: terraform
           output_format: cli
           soft_fail: false

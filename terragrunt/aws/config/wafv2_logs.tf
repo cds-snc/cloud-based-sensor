@@ -79,6 +79,7 @@ resource "aws_iam_policy" "wafv2_list_web_acls" {
 }
 
 data "aws_iam_policy_document" "wafv2_list_web_acls" {
+  # checkov:skip=CKV_AWS_109: TODO tighten down resource access
   statement {
     effect = "Allow"
     actions = [
