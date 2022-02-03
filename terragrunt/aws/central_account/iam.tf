@@ -2,7 +2,7 @@
 # Role used to read objects from the log archive bucket
 #
 resource "aws_iam_role" "log_archive_read" {
-  name               = "CbsLogArchiveBucketRead"
+  name               = "CbsASEAReaderRole"
   assume_role_policy = sensitive(data.aws_iam_policy_document.log_archive_read_assume.json)
 }
 
