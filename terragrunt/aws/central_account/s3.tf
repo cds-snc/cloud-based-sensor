@@ -26,7 +26,7 @@ module "log_archive_bucket" {
       id      = "delete-old-objects"
       enabled = true
       expiration = {
-        days = 14
+        days = 90
       }
     }
   ]
