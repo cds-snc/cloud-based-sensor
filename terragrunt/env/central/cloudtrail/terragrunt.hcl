@@ -3,7 +3,7 @@ terraform {
 }
 
 inputs = {
-  cloudtrail_bucket_name = include.inputs.satellite_bucket_name
+  cloudtrail_bucket_name = include.inputs.log_archive_bucket_name
 }
 
 include {

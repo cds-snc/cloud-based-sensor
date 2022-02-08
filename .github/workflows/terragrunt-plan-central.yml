@@ -5,8 +5,9 @@ on:
   pull_request:
     paths:
       - ".github/workflows/terragrunt-plan-central.yml"
-      - "satellite_accounts"    
+      - "satellite_accounts"
       - "terragrunt/aws/central_account/**"
+      - "terragrunt/aws/cloudtrail/**"
       - "terragrunt/env/central/**"
       - "terragrunt/env/common/**"
       - "terragrunt/env/terragrunt.hcl"
@@ -64,10 +65,13 @@ jobs:
           filters: |
             central_account:
               - 'terragrunt/aws/central_account/**'
-              - 'terragrunt/env/central/central_account/**'    
+              - 'terragrunt/env/central/central_account/**'
+            cloudtrail:
+              - 'terragrunt/aws/cloudtrail/**'
+              - 'terragrunt/env/central/cloudtrail/**'
             common:
               - '.github/workflows/terragrunt-plan-central.yml'
-              - 'satellite_accounts'               
+              - 'satellite_accounts'
               - 'terragrunt/env/common/**'
               - 'terragrunt/env/terragrunt.hcl'
 
@@ -87,3 +91,13 @@ jobs:
           comment-title: "Central account"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           terragrunt: "true"
+
+      - name: Terragrunt plan cloudtrail
+        if: ${{ steps.filter.outputs.cloudtrail == 'true' || steps.filter.outputs.common == 'true' }}
+        uses: cds-snc/terraform-plan@v2
+        with:
+          directory: "terragrunt/env/central/cloudtrail"
+          comment-delete: "true"
+          comment-title: "Central CloudTrail"
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          terragrunt: "true"          

@@ -45,7 +45,14 @@ module "log_archive_access_bucket" {
 #
 resource "aws_s3_bucket_policy" "log_archive_bucket" {
   bucket = module.log_archive_bucket.s3_bucket_id
-  policy = sensitive(data.aws_iam_policy_document.log_archive_bucket.json)
+  policy = data.aws_iam_policy_document.combined.json
+}
+
+data "aws_iam_policy_document" "combined" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.cloudtrail_write_logs.json,
+    sensitive(data.aws_iam_policy_document.log_archive_bucket.json)
+  ]
 }
 
 data "aws_iam_policy_document" "log_archive_bucket" {
@@ -77,6 +84,49 @@ data "aws_iam_policy_document" "log_archive_bucket" {
     resources = [
       module.log_archive_bucket.s3_bucket_arn
     ]
+  }
+}
+
+data "aws_iam_policy_document" "cloudtrail_write_logs" {
+
+  statement {
+    sid    = "CloudTrailGetAcl"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+    actions = [
+      "s3:GetBucketAcl"
+    ]
+    resources = [
+      module.log_archive_bucket.s3_bucket_arn
+    ]
+  }
+
+  statement {
+    sid    = "CloudTrailPutObject"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+    actions = [
+      "s3:PutObject"
+    ]
+    resources = [
+      "${module.log_archive_bucket.s3_bucket_arn}/cloudtrail_logs/AWSLogs/${var.account_id}/*"
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:cloudtrail:${var.region}:${var.account_id}:trail/CbsSatelliteTrail"]
+    }
   }
 }
 
