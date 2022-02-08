@@ -2,7 +2,7 @@
 # Satellite bucket and access logging
 #
 module "satellite_bucket" {
-  source            = "github.com/cds-snc/terraform-modules?ref=v1.0.4//S3"
+  source            = "github.com/cds-snc/terraform-modules?ref=v1.0.8//S3"
   bucket_name       = var.satellite_bucket_name
   billing_tag_value = var.billing_tag_value
 
@@ -19,7 +19,7 @@ module "satellite_bucket" {
       id      = "delete-old-objects"
       enabled = true
       expiration = {
-        days = 90
+        days = 14
       }
     }
   ]
