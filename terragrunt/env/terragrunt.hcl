@@ -13,7 +13,7 @@ inputs = {
   satellite_bucket_name              = "cbs-satellite-${get_aws_account_id()}"
   satellite_s3_replicate_role_name   = "CbsSatelliteReplicateToLogArchive"
   satellite_account_ids              = split("\n", chomp(replace(file("../../satellite_accounts"),"\"","")))
-  core_replicate_role_arn            = "arn:aws:iam::${account_id}:role/${var.satellite_s3_replicate_role_name}"
+  core_replicate_role_arn            = "arn:aws:iam::${get_aws_account_id()}:role/${var.satellite_s3_replicate_role_name}"
   core_log_archive_bucket_arn        = "arn:aws:s3:::aws-landing-zone-logs-925306372402-ca-central-1"
 }
 
