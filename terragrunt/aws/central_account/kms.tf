@@ -46,5 +46,9 @@ data "aws_iam_policy_document" "log_archive_encrypt" {
       type        = "AWS"
       identifiers = local.trusted_replicate_role_arns
     }
+    principals {
+      type        = "AWS"
+      identifiers = var.core_replicate_role_arn
+    }
   }
 }
