@@ -8,6 +8,7 @@ on:
     paths:
       - ".github/workflows/terragrunt-apply-central.yml"
       - "satellite_accounts"
+      - "terragrunt/aws/alarms/**"
       - "terragrunt/aws/central_account/**"
       - "terragrunt/aws/cloudtrail/**"
       - "terragrunt/env/central/**"
@@ -19,8 +20,9 @@ env:
   CONFTEST_VERSION: 0.27.0
   TERRAFORM_VERSION: 1.1.4
   TERRAGRUNT_VERSION: 0.36.0
-  TF_VAR_cbs_principal_arn: ${{ secrets.CBS_PRINCIPAL_ARN }}
   TF_INPUT: false
+  TF_VAR_cbs_principal_arn: ${{ secrets.CBS_PRINCIPAL_ARN }}
+  TF_VAR_slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_CBS }}
 
 permissions:
   id-token: write
@@ -65,6 +67,9 @@ jobs:
         id: filter
         with:
           filters: |
+            alarms:
+              - 'terragrunt/aws/alarms/**'
+              - 'terragrunt/env/central/alarms/**'
             central_account:
               - 'terragrunt/aws/central_account/**'
               - 'terragrunt/env/central/central_account/**'
@@ -93,3 +98,8 @@ jobs:
         if: ${{ steps.filter.outputs.cloudtrail == 'true' || steps.filter.outputs.common == 'true' }}
         working-directory: "terragrunt/env/central/cloudtrail"
         run: terragrunt apply --terragrunt-non-interactive -auto-approve
+
+      - name: Terragrunt apply alarms
+        if: ${{ steps.filter.outputs.alarms == 'true' || steps.filter.outputs.common == 'true' }}
+        working-directory: "terragrunt/env/central/alarms"
+        run: terragrunt apply --terragrunt-non-interactive -auto-approve        

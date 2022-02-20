@@ -8,6 +8,7 @@ on:
     paths:
       - ".github/workflows/terragrunt-apply-satellite.yml"
       - "satellite_accounts"
+      - "terragrunt/aws/alarms/**"      
       - "terragrunt/aws/cloudtrail/**"
       - "terragrunt/aws/config/**"
       - "terragrunt/aws/satellite_bucket/**"
@@ -21,6 +22,7 @@ env:
   TERRAFORM_VERSION: 1.1.4
   TERRAGRUNT_VERSION: 0.36.0
   TF_INPUT: false
+  TF_VAR_slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_CBS }}
 
 permissions:
   id-token: write
@@ -73,6 +75,9 @@ jobs:
         id: filter
         with:
           filters: |
+            alarms:
+              - 'terragrunt/aws/alarms/**'
+              - 'terragrunt/env/satellite/alarms/**'          
             cloudtrail:
               - 'terragrunt/aws/cloudtrail/**'
               - 'terragrunt/env/satellite/cloudtrail/**'
@@ -114,5 +119,10 @@ jobs:
         if: ${{ steps.filter.outputs.config == 'true' || steps.filter.outputs.common == 'true' }}
         working-directory: "terragrunt/env/satellite/config"
         run: terragrunt apply --terragrunt-non-interactive -auto-approve
+
+      - name: Terragrunt apply alarms
+        if: ${{ steps.filter.outputs.alarms == 'true' || steps.filter.outputs.common == 'true' }}
+        working-directory: "terragrunt/env/satellite/alarms"
+        run: terragrunt apply --terragrunt-non-interactive -auto-approve        
 
 
