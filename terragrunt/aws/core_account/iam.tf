@@ -8,6 +8,12 @@ resource "aws_iam_role" "s3_replicate" {
   assume_role_policy = data.aws_iam_policy_document.s3_replicate_assume.json
 }
 
+resource "aws_iam_policy" "s3_replicate" {
+  name   = "CoreReplicateToCBSCentral"
+  path   = "/"
+  policy = data.aws_iam_policy_document.s3_replicate.json
+}
+
 data "aws_iam_policy_document" "s3_replicate_assume" {
   statement {
     actions = ["sts:AssumeRole"]
