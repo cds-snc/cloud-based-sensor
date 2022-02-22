@@ -63,7 +63,7 @@ data "aws_iam_policy_document" "log_archive_bucket" {
     }
     principals {
       type        = "AWS"
-      identifiers = var.core_replicate_role_arn
+      identifiers = [var.core_replicate_role_arn]
     }
     actions = [
       "s3:ObjectOwnerOverrideToBucketOwner",
@@ -82,7 +82,7 @@ data "aws_iam_policy_document" "log_archive_bucket" {
     }
     principals {
       type        = "AWS"
-      identifiers = var.core_replicate_role_arn
+      identifiers = [var.core_replicate_role_arn]
     }
     actions = [
       "s3:List*",
