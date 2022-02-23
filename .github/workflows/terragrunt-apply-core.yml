@@ -17,7 +17,6 @@ env:
   CONFTEST_VERSION: 0.27.0
   TERRAFORM_VERSION: 1.1.4
   TERRAGRUNT_VERSION: 0.36.0
-  TF_VAR_cbs_principal_arn: ${{ secrets.CBS_PRINCIPAL_ARN }}
   TF_INPUT: false
 
 permissions:
@@ -48,15 +47,6 @@ jobs:
           chmod +x bin/*
           echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
 
-      - name: Install Conftest
-        run: |
-          wget "https://github.com/open-policy-agent/conftest/releases/download/v${{ env.CONFTEST_VERSION }}/conftest_${{ env.CONFTEST_VERSION }}_Linux_x86_64.tar.gz" \
-          && wget "https://github.com/open-policy-agent/conftest/releases/download/v${{ env.CONFTEST_VERSION }}/checksums.txt" \
-          && grep 'Linux_x86_64.tar.gz' < checksums.txt | sha256sum --check  --status \
-          && tar -zxvf "conftest_${{ env.CONFTEST_VERSION }}_Linux_x86_64.tar.gz" conftest \
-          && mv conftest /usr/local/bin \
-          && rm "conftest_${{ env.CONFTEST_VERSION }}_Linux_x86_64.tar.gz" checksums.txt
-
       - uses: cds-snc/paths-filter@v2.10.3
         id: filter
         with:
@@ -66,7 +56,6 @@ jobs:
               - 'terragrunt/env/core/core_account/**'
             common:
               - '.github/workflows/terragrunt-apply-core.yml'
-              - 'satellite_accounts'
               - 'terragrunt/env/common/**'
               - 'terragrunt/env/terragrunt.hcl'
 
@@ -76,6 +65,11 @@ jobs:
           role-to-assume: arn:aws:iam::871282759583:role/ConfigTerraformAdministratorRole
           role-session-name: CBSGitHubActions
           aws-region: "ca-central-1"
+
+      - name: Set the Terragrunt IAM role
+        run: |
+          echo "TERRAGRUNT_IAM_ROLE=arn:aws:iam::925306372402:role/ConfigTerraformAdminExecutionRole" >> $GITHUB_ENV 
+          echo "TERRAGRUNT_IAM_ASSUME_ROLE_SESSION_NAME=CBSGitHubActions" >> $GITHUB_ENV
 
       - name: Terragrunt apply core account
         if: ${{ steps.filter.outputs.central_account == 'true' || steps.filter.outputs.common == 'true' }}
