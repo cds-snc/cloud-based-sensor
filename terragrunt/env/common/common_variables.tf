@@ -53,3 +53,8 @@ variable "core_log_archive_bucket_arn" {
   description = "arn of the bucket in core log archive account accepting logs from the CBS bucket."
   type        = string
 }
+
+variable "sentinel_cloudtrail_bucket_arn" {
+  description = "arn of the bucket used to collect core logs and funnel to sentinel"
+  type        = string
+}
