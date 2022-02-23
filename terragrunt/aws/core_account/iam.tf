@@ -38,14 +38,16 @@ data "aws_iam_policy_document" "s3_replicate" {
       "s3:ListBucket"
     ]
     resources = [
-      var.core_log_archive_bucket_arn
+      var.core_log_archive_bucket_arn,
     ]
   }
   statement {
     effect = "Allow"
     actions = [
       "s3:GetObjectVersion",
-      "s3:GetObjectVersionAcl"
+      "s3:GetObjectVersionAcl",
+      "s3:GetObjectVersionTagging",
+      "s3:GetObjectVersionForReplication"
     ]
     resources = [
       "${var.core_log_archive_bucket_arn}/*",
@@ -56,10 +58,12 @@ data "aws_iam_policy_document" "s3_replicate" {
     actions = [
       "s3:ObjectOwnerOverrideToBucketOwner",
       "s3:ReplicateObject",
+      "s3:ReplicateTags",
       "s3:ReplicateDelete"
     ]
     resources = [
       "${local.log_archive_bucket_arn}/*",
+      "${local.sentinel_cloudtrail_bucket_arn}/*",
     ]
   }
 }
