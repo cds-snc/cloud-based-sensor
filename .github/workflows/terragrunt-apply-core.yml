@@ -1,0 +1,77 @@
+name: "Terragrunt apply core"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/terragrunt-apply-core.yml"
+      - "terragrunt/aws/core_account/**"
+      - "terragrunt/env/core/**"
+      - "terragrunt/env/common/**"
+      - "terragrunt/env/terragrunt.hcl"
+
+env:
+  AWS_REGION: ca-central-1
+  CONFTEST_VERSION: 0.27.0
+  TERRAFORM_VERSION: 1.1.4
+  TERRAGRUNT_VERSION: 0.36.0
+  TF_INPUT: false
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+  actions: write
+  checks: write
+  statuses: write
+
+jobs:
+  terragrunt-apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@3d8debd658c92063839bc97da5c2427100420dec # v1.3.2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      - name: Setup Terragrunt
+        run: |
+          mkdir bin
+          wget -O bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/v$TERRAGRUNT_VERSION/terragrunt_linux_amd64
+          chmod +x bin/*
+          echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
+
+      - uses: cds-snc/paths-filter@v2.10.3
+        id: filter
+        with:
+          filters: |
+            central_account:
+              - 'terragrunt/aws/core_account/**'
+              - 'terragrunt/env/core/core_account/**'
+            common:
+              - '.github/workflows/terragrunt-apply-core.yml'
+              - 'terragrunt/env/common/**'
+              - 'terragrunt/env/terragrunt.hcl'
+
+      - name: configure aws credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          role-to-assume: arn:aws:iam::871282759583:role/ConfigTerraformAdministratorRole
+          role-session-name: CBSGitHubActions
+          aws-region: "ca-central-1"
+
+      - name: Set the Terragrunt IAM role
+        run: |
+          echo "TERRAGRUNT_IAM_ROLE=arn:aws:iam::925306372402:role/ConfigTerraformAdminExecutionRole" >> $GITHUB_ENV 
+          echo "TERRAGRUNT_IAM_ASSUME_ROLE_SESSION_NAME=CBSGitHubActions" >> $GITHUB_ENV
+
+      - name: Terragrunt apply core account
+        if: ${{ steps.filter.outputs.central_account == 'true' || steps.filter.outputs.common == 'true' }}
+        working-directory: "terragrunt/env/core/core_account"
+        run: terragrunt apply --terragrunt-non-interactive -auto-approve

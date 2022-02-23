@@ -1,5 +1,4 @@
 locals {
-  vars                   = read_terragrunt_config("../env_vars.hcl")
   log_archive_account_id = "871282759583"
 }
 
@@ -13,6 +12,8 @@ inputs = {
   satellite_bucket_name              = "cbs-satellite-${get_aws_account_id()}"
   satellite_s3_replicate_role_name   = "CbsSatelliteReplicateToLogArchive"
   satellite_account_ids              = split("\n", chomp(replace(file("../../satellite_accounts"),"\"","")))
+  core_replicate_role_arn            = "arn:aws:iam::925306372402:role/CoreReplicateToCBSCentral"
+  core_log_archive_bucket_arn        = "arn:aws:s3:::aws-landing-zone-logs-925306372402-ca-central-1"
 }
 
 remote_state {
