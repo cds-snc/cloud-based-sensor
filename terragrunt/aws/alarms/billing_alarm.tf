@@ -7,6 +7,7 @@ resource "aws_cloudwatch_metric_alarm" "billing_change_over_threshold" {
   evaluation_periods  = "1"
   threshold           = var.billing_change_percent_threshold
   alarm_description   = "Estimated billing change greater than threshold in 6 hour period"
+  treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.cloudwatch_alarm_us_east.arn]
   ok_actions          = [aws_sns_topic.cloudwatch_alarm_us_east.arn]
 
