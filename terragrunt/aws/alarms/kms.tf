@@ -11,6 +11,7 @@ resource "aws_kms_key" "sns_cloudwatch_us_east" {
   tags = {
     (var.billing_tag_key) = var.billing_tag_value
     Terraform             = true
+    Product               = "cloud-based-sensor"
   }
 }
 
