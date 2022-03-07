@@ -9,7 +9,6 @@ resource "aws_cloudwatch_metric_alarm" "billing_change_over_threshold" {
   alarm_description   = "Estimated billing anomaly"
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.cloudwatch_alarm_us_east.arn]
-  ok_actions          = [aws_sns_topic.cloudwatch_alarm_us_east.arn]
 
   metric_query {
     id          = "anomaly"
