@@ -6,8 +6,7 @@ on:
     paths:
       - ".github/workflows/terragrunt-plan-satellite.yml"
       - "satellite_accounts"
-      - "terragrunt/aws/alarms/**"      
-      - "terragrunt/aws/cloudtrail/**"
+      - "terragrunt/aws/alarms/**"
       - "terragrunt/aws/config/**"
       - "terragrunt/aws/satellite_bucket/**"
       - "terragrunt/env/common/**"
@@ -31,7 +30,6 @@ permissions:
   statuses: write
 
 jobs:
-
   retrieve-accounts:
     uses: cds-snc/cloud-based-sensor/.github/workflows/retrieve-accounts.yml@main
 
@@ -43,7 +41,6 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -76,9 +73,6 @@ jobs:
             alarms:
               - 'terragrunt/aws/alarms/**'
               - 'terragrunt/env/satellite/alarms/**'          
-            cloudtrail:
-              - 'terragrunt/aws/cloudtrail/**'
-              - 'terragrunt/env/satellite/cloudtrail/**'
             config:
               - 'terragrunt/aws/config/**'
               - 'terragrunt/env/satellite/config/**'
@@ -96,7 +90,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::871282759583:role/ConfigTerraformAdministratorRole
           role-session-name: CBSGitHubActions
-          aws-region: 'ca-central-1'
+          aws-region: "ca-central-1"
 
       - name: Set the Terragrunt IAM role
         run: |
@@ -110,16 +104,6 @@ jobs:
           directory: "terragrunt/env/satellite/satellite_bucket"
           comment-delete: "true"
           comment-title: "${{ matrix.account }}: Satellite bucket"
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-          terragrunt: "true"
-
-      - name: Terragrunt plan cloudtrail
-        if: ${{ steps.filter.outputs.cloudtrail == 'true' || steps.filter.outputs.common == 'true' }}
-        uses: cds-snc/terraform-plan@v2
-        with:
-          directory: "terragrunt/env/satellite/cloudtrail"
-          comment-delete: "true"
-          comment-title: "${{ matrix.account }}: CloudTrail"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           terragrunt: "true"
 
@@ -141,4 +125,4 @@ jobs:
           comment-delete: "true"
           comment-title: "${{ matrix.account }}: Alarms"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
-          terragrunt: "true"          
+          terragrunt: "true"
