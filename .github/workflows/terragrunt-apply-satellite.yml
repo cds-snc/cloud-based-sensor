@@ -65,7 +65,7 @@ jobs:
             alarms:
               - 'terragrunt/aws/alarms/**'
               - 'terragrunt/env/satellite/alarms/**'          
-             config:
+            config:
               - 'terragrunt/aws/config/**'
               - 'terragrunt/env/satellite/config/**'
             satellite_bucket:
