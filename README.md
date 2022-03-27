@@ -39,6 +39,8 @@ terragrunt import \
 1. Create a Pull Request with the new account ID added to [`./satellite_accounts`](./satellite_accounts).
 
 # Log archive structure
+**Note:** Cloudtrail logs are now centralized in the `o-gfiiyvq1tj` folder. This is the central Log Archive bucket name that all accounts log their Cloudtrail data to when they are created. After April 2022 the `cloudtrail_logs` folder will be empty as we only keep data for 14 days and no new data will be sent.
+
 ```
 cbs-log-archive-bucket/
 ├─ [cloudtrail_logs]/
@@ -53,6 +55,12 @@ cbs-log-archive-bucket/
 │  │  │  ├─ file
 │  │  │  ├─ ...
 │  │  │  
+├─ [o-gfiiyvq1tj]/
+│  ├─ [AWSLogs]/
+│  │  ├─ [aws_account_id]
+│  │  │  ├─ file
+│  │  │  ├─ ...
+│  │  │ 
 ├─ [vpc_flow_logs]/
 │  ├─ [AWSLogs]/
 │  │  ├─ [aws_account_id]

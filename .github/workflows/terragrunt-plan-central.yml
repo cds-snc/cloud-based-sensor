@@ -8,7 +8,6 @@ on:
       - "satellite_accounts"
       - "terragrunt/aws/alarms/**"
       - "terragrunt/aws/central_account/**"
-      - "terragrunt/aws/cloudtrail/**"
       - "terragrunt/env/central/**"
       - "terragrunt/env/common/**"
       - "terragrunt/env/terragrunt.hcl"
@@ -31,11 +30,9 @@ permissions:
   statuses: write
 
 jobs:
-
   terragrunt-plan:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -71,9 +68,6 @@ jobs:
             central_account:
               - 'terragrunt/aws/central_account/**'
               - 'terragrunt/env/central/central_account/**'
-            cloudtrail:
-              - 'terragrunt/aws/cloudtrail/**'
-              - 'terragrunt/env/central/cloudtrail/**'
             common:
               - '.github/workflows/terragrunt-plan-central.yml'
               - 'satellite_accounts'
@@ -85,7 +79,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::871282759583:role/ConfigTerraformAdministratorRole
           role-session-name: CBSGitHubActions
-          aws-region: 'ca-central-1'
+          aws-region: "ca-central-1"
 
       - name: Terragrunt plan central account
         if: ${{ steps.filter.outputs.central_account == 'true' || steps.filter.outputs.common == 'true' }}
@@ -94,16 +88,6 @@ jobs:
           directory: "terragrunt/env/central/central_account"
           comment-delete: "true"
           comment-title: "Central account"
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-          terragrunt: "true"
-
-      - name: Terragrunt plan cloudtrail
-        if: ${{ steps.filter.outputs.cloudtrail == 'true' || steps.filter.outputs.common == 'true' }}
-        uses: cds-snc/terraform-plan@v2
-        with:
-          directory: "terragrunt/env/central/cloudtrail"
-          comment-delete: "true"
-          comment-title: "Central CloudTrail"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           terragrunt: "true"
 

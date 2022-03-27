@@ -8,8 +8,7 @@ on:
     paths:
       - ".github/workflows/terragrunt-apply-satellite.yml"
       - "satellite_accounts"
-      - "terragrunt/aws/alarms/**"      
-      - "terragrunt/aws/cloudtrail/**"
+      - "terragrunt/aws/alarms/**"
       - "terragrunt/aws/config/**"
       - "terragrunt/aws/satellite_bucket/**"
       - "terragrunt/env/common/**"
@@ -32,7 +31,6 @@ permissions:
   statuses: write
 
 jobs:
-
   retrieve-accounts:
     uses: cds-snc/cloud-based-sensor/.github/workflows/retrieve-accounts.yml@main
 
@@ -44,7 +42,6 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -68,9 +65,6 @@ jobs:
             alarms:
               - 'terragrunt/aws/alarms/**'
               - 'terragrunt/env/satellite/alarms/**'          
-            cloudtrail:
-              - 'terragrunt/aws/cloudtrail/**'
-              - 'terragrunt/env/satellite/cloudtrail/**'
             config:
               - 'terragrunt/aws/config/**'
               - 'terragrunt/env/satellite/config/**'
@@ -88,7 +82,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::871282759583:role/ConfigTerraformAdministratorRole
           role-session-name: CBSGitHubActions
-          aws-region: 'ca-central-1'
+          aws-region: "ca-central-1"
 
       - name: Set the Terragrunt IAM role
         run: |
@@ -100,11 +94,6 @@ jobs:
         working-directory: "terragrunt/env/satellite/satellite_bucket"
         run: terragrunt apply --terragrunt-non-interactive -auto-approve
 
-      - name: Terragrunt apply cloudtrail
-        if: ${{ steps.filter.outputs.cloudtrail == 'true' || steps.filter.outputs.common == 'true' }}
-        working-directory: "terragrunt/env/satellite/cloudtrail"
-        run: terragrunt apply --terragrunt-non-interactive -auto-approve
-
       - name: Terragrunt apply config
         if: ${{ steps.filter.outputs.config == 'true' || steps.filter.outputs.common == 'true' }}
         working-directory: "terragrunt/env/satellite/config"
@@ -113,6 +102,4 @@ jobs:
       - name: Terragrunt apply alarms
         if: ${{ steps.filter.outputs.alarms == 'true' || steps.filter.outputs.common == 'true' }}
         working-directory: "terragrunt/env/satellite/alarms"
-        run: terragrunt apply --terragrunt-non-interactive -auto-approve        
-
-
+        run: terragrunt apply --terragrunt-non-interactive -auto-approve
