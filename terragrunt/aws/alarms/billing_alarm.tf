@@ -3,7 +3,7 @@ resource "aws_cloudwatch_metric_alarm" "billing_change_over_threshold" {
   provider = aws.us-east-1
 
   alarm_name          = "CbsBillingChangeOverThreshold"
-  comparison_operator = "GreaterThanUpperThreshold"
+  comparison_operator = "LessThanLowerOrGreaterThanUpperThreshold"
   evaluation_periods  = "1"
   threshold_metric_id = "anomaly"
   alarm_description   = "Estimated billing anomaly"
