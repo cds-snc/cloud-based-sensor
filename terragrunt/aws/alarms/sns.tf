@@ -22,7 +22,7 @@ resource "aws_sns_topic_subscription" "cloudwatch_alarm_us_east" {
 }
 
 module "notify_slack" {
-  source = "github.com/cds-snc/terraform-modules?ref=v1.0.10//notify_slack"
+  source = "github.com/cds-snc/terraform-modules?ref=v2.0.3//notify_slack"
 
   function_name     = "cbs-notify-slack"
   project_name      = var.account_id
