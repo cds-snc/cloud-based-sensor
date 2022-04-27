@@ -165,7 +165,7 @@ data "aws_iam_policy_document" "log_delivery_write_logs" {
       "s3:PutObject"
     ]
     resources = [
-      "${module.satellite_bucket.s3_bucket_arn}/vpc_flow_logs/AWSLogs/${var.account_id}/*"
+      "${module.satellite_bucket.s3_bucket_arn}/*/AWSLogs/${var.account_id}/*"
     ]
     condition {
       test     = "ArnLike"
