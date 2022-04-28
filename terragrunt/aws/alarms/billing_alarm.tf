@@ -12,7 +12,7 @@ resource "aws_cloudwatch_metric_alarm" "billing_change_over_threshold" {
 
   metric_query {
     id          = "anomaly"
-    expression  = "ANOMALY_DETECTION_BAND(m1, 3)"
+    expression  = "ANOMALY_DETECTION_BAND(current, 3)"
     label       = "Billing (Expected)"
     return_data = "true"
   }
