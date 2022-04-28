@@ -12,7 +12,7 @@ resource "aws_cloudwatch_metric_alarm" "billing_change_over_threshold" {
 
   metric_query {
     id          = "anomaly"
-    expression  = "ANOMALY_DETECTION_BAND(current)"
+    expression  = "ANOMALY_DETECTION_BAND(m1, 3)"
     label       = "Billing (Expected)"
     return_data = "true"
   }
@@ -26,7 +26,7 @@ resource "aws_cloudwatch_metric_alarm" "billing_change_over_threshold" {
       metric_name = "EstimatedCharges"
       namespace   = "AWS/Billing"
       period      = "21600"
-      stat        = "Maximum"
+      stat        = "Average"
       dimensions = {
         Currency = "USD"
       }
