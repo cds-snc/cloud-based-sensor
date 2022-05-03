@@ -3,8 +3,8 @@ resource "aws_cloudwatch_metric_alarm" "billing_change_over_threshold" {
   provider = aws.us-east-1
 
   alarm_name          = "CbsBillingChangeOverThreshold"
-  comparison_operator = "LessThanLowerOrGreaterThanUpperThreshold"
-  evaluation_periods  = "1"
+  comparison_operator = "GreaterThanUpperThreshold"
+  evaluation_periods  = "2"
   threshold_metric_id = "anomaly"
   alarm_description   = "Estimated billing anomaly"
   treat_missing_data  = "notBreaching"
@@ -12,7 +12,7 @@ resource "aws_cloudwatch_metric_alarm" "billing_change_over_threshold" {
 
   metric_query {
     id          = "anomaly"
-    expression  = "ANOMALY_DETECTION_BAND(current, 3)"
+    expression  = "ANOMALY_DETECTION_BAND(current, 4)"
     label       = "Billing (Expected)"
     return_data = "true"
   }
@@ -25,7 +25,7 @@ resource "aws_cloudwatch_metric_alarm" "billing_change_over_threshold" {
     metric {
       metric_name = "EstimatedCharges"
       namespace   = "AWS/Billing"
-      period      = "21600"
+      period      = "43200"
       stat        = "Average"
       dimensions = {
         Currency = "USD"
