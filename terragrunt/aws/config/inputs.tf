@@ -7,6 +7,6 @@ variable "config_max_execution_frequency" {
 
 variable "config_rules_ff" {
   description = "A feature flag to turn off config rules, turn off for Control Tower Accounts"
-  default     = true
+  default     = false
   type        = string
 }
