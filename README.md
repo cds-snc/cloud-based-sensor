@@ -8,14 +8,6 @@ Infrastructure to support the Canadian Centre for Cyber Security (CCCS) Cloud Ba
 
 This repo uses Terraform and Terragrunt to define and manage the satellite and central account AWS resources.
 
-# Config rules
-This project sets up [AWS managed and custom Lambda ConfigRules](./terragrunt/aws/config) to check that:
-
-* the expected CBS resource exist; and
-* logs are being sent to the satellite bucket.
-
-The [`compliance-check.yml`](.github/workflows/compliance-check.yml) is then used to notify us when rules are non-compliant.  This will be switched to an SNS topic and subscription.
-
 # Setup
 We use a bootstrap pattern to onboard new accounts so that we can create the OpenID Connect IAM roles that are used by our [Terraform GitHub Actions](./.github/workflows).  The following is only required once per account.
 
