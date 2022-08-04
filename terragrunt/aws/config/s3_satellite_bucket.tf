@@ -2,12 +2,14 @@
 # Lambda function used by the ConfigRule
 #
 data "archive_file" "cbs_s3_satellite_bucket_rule" {
+  count = var.config_rules_ff ? 1 : 0
   type        = "zip"
   source_file = "config_rules/s3_satellite_bucket/s3_satellite_bucket_rule.py"
   output_path = "/tmp/cbs_s3_satellite_bucket_rule.zip"
 }
 
 resource "aws_lambda_function" "cbs_s3_satellite_bucket_rule" {
+  count = var.config_rules_ff ? 1 : 0
   filename      = "/tmp/cbs_s3_satellite_bucket_rule.zip"
   function_name = "CbsS3SatelliteBucketRule"
   role          = aws_iam_role.cbs_s3_satellite_bucket_rule.arn
@@ -27,6 +29,8 @@ resource "aws_lambda_function" "cbs_s3_satellite_bucket_rule" {
 }
 
 resource "aws_lambda_permission" "cbs_s3_satellite_bucket_rule" {
+
+  count = var.config_rules_ff ? 1 : 0
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.cbs_s3_satellite_bucket_rule.arn
   principal     = "config.amazonaws.com"
@@ -34,6 +38,7 @@ resource "aws_lambda_permission" "cbs_s3_satellite_bucket_rule" {
 }
 
 resource "aws_cloudwatch_log_group" "cbs_s3_satellite_bucket_rule" {
+  count = var.config_rules_ff ? 1 : 0
   name              = "/aws/lambda/${aws_lambda_function.cbs_s3_satellite_bucket_rule.function_name}"
   retention_in_days = 14
 
@@ -47,6 +52,7 @@ resource "aws_cloudwatch_log_group" "cbs_s3_satellite_bucket_rule" {
 # Lambda execution role
 #
 resource "aws_iam_role" "cbs_s3_satellite_bucket_rule" {
+  count = var.config_rules_ff ? 1 : 0
   name               = "CbsS3SatelliteBucketRule"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume.json
 
@@ -57,6 +63,7 @@ resource "aws_iam_role" "cbs_s3_satellite_bucket_rule" {
 }
 
 resource "aws_iam_role_policy_attachment" "cbs_s3_satellite_bucket_rule_basic_execution" {
+  count = var.config_rules_ff ? 1 : 0
   role       = aws_iam_role.cbs_s3_satellite_bucket_rule.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }

@@ -4,3 +4,9 @@ variable "config_max_execution_frequency" {
   default     = "TwentyFour_Hours"
   type        = string
 }
+
+variable "config_rules_ff" { 
+  description = "A feature flag to turn off config rules, turn off for Control Tower Accounts"
+  default = true
+  type = string
+}
