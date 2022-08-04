@@ -1,6 +1,6 @@
 resource "aws_config_conformance_pack" "cbs" {
   count = var.config_rules_ff ? 1 : 0
-  name = "cloud-based-sensor"
+  name  = "cloud-based-sensor"
 
   template_body = data.template_file.cbs_conformance_pack[0].rendered
 
@@ -11,7 +11,7 @@ resource "aws_config_conformance_pack" "cbs" {
 }
 
 data "template_file" "cbs_conformance_pack" {
-  count = var.config_rules_ff ? 1 : 0
+  count    = var.config_rules_ff ? 1 : 0
   template = file("conformance_packs/cloud_based_sensor.yml")
   vars = {
     satellite_logging_bucket                = var.satellite_bucket_name

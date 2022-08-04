@@ -1,5 +1,6 @@
 // Allow IAM policy to assume the role for AWS Config
 data "aws_iam_policy_document" "aws_config_assume_role_policy" {
+  count = var.config_rules_ff ? 1 : 0
   statement {
     actions = ["sts:AssumeRole"]
 
@@ -18,6 +19,7 @@ data "aws_iam_policy_document" "aws_config_assume_role_policy" {
 }
 
 data "aws_iam_policy_document" "aws_config_policy" {
+  count = var.config_rules_ff ? 1 : 0
   statement {
     effect = "Allow"
     actions = [
