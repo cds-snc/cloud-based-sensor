@@ -53,7 +53,7 @@ resource "aws_cloudwatch_log_group" "cbs_wafv2_logs_rule" {
 resource "aws_iam_role" "cbs_wafv2_logs_rule" {
   count              = var.config_rules_ff ? 1 : 0
   name               = "cbs-wafv2-logs-rule"
-  assume_role_policy = data.aws_iam_policy_document[0].lambda_assume.json
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume[0].json
 
   tags = {
     (var.billing_tag_key) = var.billing_tag_value
