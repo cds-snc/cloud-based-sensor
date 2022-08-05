@@ -7,7 +7,6 @@ on:
       - ".github/workflows/terragrunt-plan-satellite.yml"
       - "satellite_accounts"
       - "terragrunt/aws/alarms/**"
-      - "terragrunt/aws/config/**"
       - "terragrunt/aws/satellite_bucket/**"
       - "terragrunt/env/common/**"
       - "terragrunt/env/satellite/**"
@@ -72,10 +71,7 @@ jobs:
           filters: |
             alarms:
               - 'terragrunt/aws/alarms/**'
-              - 'terragrunt/env/satellite/alarms/**'          
-            config:
-              - 'terragrunt/aws/config/**'
-              - 'terragrunt/env/satellite/config/**'
+              - 'terragrunt/env/satellite/alarms/**'
             satellite_bucket:
               - 'terragrunt/aws/satellite_bucket/**'
               - 'terragrunt/env/satellite/satellite_bucket/**'
@@ -104,16 +100,6 @@ jobs:
           directory: "terragrunt/env/satellite/satellite_bucket"
           comment-delete: "true"
           comment-title: "${{ matrix.account }}: Satellite bucket"
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-          terragrunt: "true"
-
-      - name: Terragrunt plan config
-        if: ${{ steps.filter.outputs.config == 'true' || steps.filter.outputs.common == 'true' }}
-        uses: cds-snc/terraform-plan@v2
-        with:
-          directory: "terragrunt/env/satellite/config"
-          comment-delete: "true"
-          comment-title: "${{ matrix.account }}: ConfigRules"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           terragrunt: "true"
 
