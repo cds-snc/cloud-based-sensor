@@ -1,7 +1,11 @@
 locals {
-  trusted_replicate_role_arns = [
+  calculated_replicate_role_arns = [
     for account_id in var.satellite_account_ids : "arn:aws:iam::${account_id}:role/${var.satellite_s3_replicate_role_name}"
   ]
+  trusted_replicate_role_arns = concat(
+    local.calculated_replicate_role_arns,
+    ["arn:aws:iam::274536870005:role/service-role/s3crr_role_for_aws-controltower-logs-274536870005-ca-central-1"]
+  )
 }
 
 #
