@@ -64,7 +64,7 @@ jobs:
 
       - name: Terragrunt plan central account
         if: ${{ steps.filter.outputs.central_account == 'true' || steps.filter.outputs.common == 'true' }}
-        uses: cds-snc/terraform-plan@dce0ba2ac808e5c2b3499c8073adef25aaa559f3 # tag=v2
+        uses: cds-snc/terraform-plan@9167b029401f6360db0a2bc4b379b88532e78a77 # tag=v2
         with:
           directory: "terragrunt/env/central/central_account"
           comment-delete: "true"
@@ -74,7 +74,7 @@ jobs:
 
       - name: Terragrunt plan alarms
         if: ${{ steps.filter.outputs.alarms == 'true' || steps.filter.outputs.common == 'true' }}
-        uses: cds-snc/terraform-plan@dce0ba2ac808e5c2b3499c8073adef25aaa559f3 # tag=v2
+        uses: cds-snc/terraform-plan@9167b029401f6360db0a2bc4b379b88532e78a77 # tag=v2
         with:
           directory: "terragrunt/env/central/alarms"
           comment-delete: "true"
