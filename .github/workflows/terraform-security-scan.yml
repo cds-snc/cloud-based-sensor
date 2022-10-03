@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@7884fcad6b5d53d10323aee724dc68d8b9096a2e # tag=v2.4.2
 
       - name: Checkov security scan
-        uses: bridgecrewio/checkov-action@8d1675bd19257514c72879a34c5dfe108d0d3028 # latest as of Jan 19, 2022
+        uses: bridgecrewio/checkov-action@99bb2caf247dfd9f03cf984373bc6043d4e32ebf # tag=v12.1802.0
         with:
           directory: terragrunt/aws
           framework: terraform
