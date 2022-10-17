@@ -76,7 +76,7 @@ jobs:
 
       - name: Terragrunt plan satellite bucket
         if: ${{ steps.filter.outputs.satellite_bucket == 'true' || steps.filter.outputs.common == 'true' }}
-        uses: cds-snc/terraform-plan@9167b029401f6360db0a2bc4b379b88532e78a77 # tag=v2.3.0
+        uses: cds-snc/terraform-plan@8be66db9c815352044405fd33120b91918bf1f2e # tag=v2.3.1
         with:
           directory: "terragrunt/env/satellite/satellite_bucket"
           comment-delete: "true"
@@ -86,7 +86,7 @@ jobs:
 
       - name: Terragrunt plan alarms
         if: ${{ steps.filter.outputs.alarms == 'true' || steps.filter.outputs.common == 'true' }}
-        uses: cds-snc/terraform-plan@9167b029401f6360db0a2bc4b379b88532e78a77 # tag=v2.3.0
+        uses: cds-snc/terraform-plan@8be66db9c815352044405fd33120b91918bf1f2e # tag=v2.3.1
         with:
           directory: "terragrunt/env/satellite/alarms"
           comment-delete: "true"
