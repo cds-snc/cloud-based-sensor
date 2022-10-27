@@ -58,7 +58,7 @@ data "aws_iam_policy_document" "log_archive_topic_policy" {
     ]
     principals {
       type        = "AWS"
-      identifiers = [var.log_archive_account_id]
+      identifiers = ["arn:aws:iam::${var.log_archive_account_id}:root"]
     }
   }
 
