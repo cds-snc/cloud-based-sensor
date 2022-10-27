@@ -99,12 +99,8 @@ data "aws_iam_policy_document" "log_archive_bucket" {
 }
 
 #
-# Notify the CBS transport Lambda when a new object is created
+# Publish a notification to the SNS topic when objects are created
 #
-data "aws_lambda_function" "cbs_transport_lambda" {
-  function_name = var.cbs_transport_lambda_name
-}
-
 resource "aws_s3_bucket_notification" "cbs_transport_lambda" {
   bucket = module.log_archive_bucket.s3_bucket_id
 
