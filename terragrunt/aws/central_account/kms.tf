@@ -51,4 +51,49 @@ data "aws_iam_policy_document" "log_archive_encrypt" {
       identifiers = [var.core_replicate_role_arn]
     }
   }
+
+  statement {
+    sid    = "AllowSNSAccess"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey*",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:DescribeKey"
+    ]
+    resources = ["*"]
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+      values = [
+        "sns.${var.region}.amazonaws.com"
+      ]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "kms:CallerAccount"
+      values = [
+        var.log_archive_account_id
+      ]
+    }
+  }
+
+  statement {
+    sid    = "AllowS3Access"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey*"
+    ]
+    resources = ["*"]
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+  }
 }
