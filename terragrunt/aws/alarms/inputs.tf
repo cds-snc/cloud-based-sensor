@@ -3,3 +3,9 @@ variable "slack_webhook_url" {
   type        = string
   sensitive   = true
 }
+
+variable "transport_lambda_log_group_name" {
+  description = "Name of the CBS transport lambda's CloudWatch log group"
+  type        = string
+  default     = ""
+}

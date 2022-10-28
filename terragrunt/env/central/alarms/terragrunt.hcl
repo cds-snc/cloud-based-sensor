@@ -3,7 +3,7 @@ terraform {
 }
 
 inputs = {
-  billing_change_percent_threshold = "10"
+  transport_lambda_log_group_name  = "/aws/lambda/CbsTransportLambda"
 }
 
 include {
