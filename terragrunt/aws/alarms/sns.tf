@@ -12,7 +12,7 @@ resource "aws_sns_topic" "cloudwatch_alarm" {
 }
 
 resource "aws_sns_topic_subscription" "cloudwatch_alarm" {
-  topic_arn = aws_sns_topic.cloudwatch_alarm_us_east.arn
+  topic_arn = aws_sns_topic.cloudwatch_alarm.arn
   protocol  = "lambda"
   endpoint  = module.notify_slack.lambda_arn
 }
