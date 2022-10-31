@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # tag=v3.1.0
 
       - name: Setup terraform tools
-        uses: cds-snc/terraform-tools-setup@v1
+        uses: cds-snc/terraform-tools-setup@cc15ce9039f6c37c592fb9930b70466b229d2e9b # tag=v1
 
       - uses: cds-snc/paths-filter@87bb78bc509076907db04d7f616bd2533af0e7fe # tag=v2.10.3
         id: filter
@@ -61,7 +61,7 @@ jobs:
 
       - name: Terragrunt plan core account
         if: ${{ steps.filter.outputs.core_account == 'true' || steps.filter.outputs.common == 'true' }}
-        uses: cds-snc/terraform-plan@8be66db9c815352044405fd33120b91918bf1f2e # tag=v2.3.1
+        uses: cds-snc/terraform-plan@2d993abb8bfaa2d48bcd7793cd5602f004686a3a # tag=v3.0.0
         with:
           directory: "terragrunt/env/core/core_account"
           comment-delete: "true"
