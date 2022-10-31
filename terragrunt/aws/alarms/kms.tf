@@ -13,20 +13,6 @@ resource "aws_kms_key" "sns_cloudwatch" {
   }
 }
 
-resource "aws_kms_key" "sns_cloudwatch_us_east" {
-  provider = aws.us-east-1
-
-  # checkov:skip=CKV_AWS_7: key rotation not required for CloudWatch SNS topic's messages
-  description = "KMS key for CloudWatch SNS topic"
-  policy      = data.aws_iam_policy_document.sns_cloudwatch.json
-
-  tags = {
-    (var.billing_tag_key) = var.billing_tag_value
-    Terraform             = true
-    Product               = "cloud-based-sensor"
-  }
-}
-
 data "aws_iam_policy_document" "sns_cloudwatch" {
   # checkov:skip=CKV_AWS_109: `resources = ["*"]` identifies the KMS key to which the key policy is attached
   # checkov:skip=CKV_AWS_111: `resources = ["*"]` identifies the KMS key to which the key policy is attached
