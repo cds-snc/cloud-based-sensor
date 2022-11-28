@@ -1,12 +1,12 @@
 resource "aws_cloudwatch_metric_alarm" "no_transport_lambda_logs" {
   alarm_name          = "NoTransportLambdaNoLogs"
-  alarm_description   = "CBS Transport lambda is sending logs to CCCS over a 10 minute period"
+  alarm_description   = "CBS Transport lambda is sending logs to CCCS over a 30 minute period"
   comparison_operator = "LessThanThreshold"
 
   metric_name        = "IncomingLogEvents"
   namespace          = "AWS/Logs"
   period             = "300"
-  evaluation_periods = "2"
+  evaluation_periods = "6"
   statistic          = "Sum"
   threshold          = "100"
   treat_missing_data = "notBreaching"
