@@ -61,7 +61,7 @@ jobs:
 
       - name: Terragrunt plan core account
         if: ${{ steps.filter.outputs.core_account == 'true' || steps.filter.outputs.common == 'true' }}
-        uses: cds-snc/terraform-plan@2d993abb8bfaa2d48bcd7793cd5602f004686a3a # tag=v3.0.0
+        uses: cds-snc/terraform-plan@478000c57b4effd0bc6e1194a2c180a2915c65f2 # v3.0.1
         with:
           directory: "terragrunt/env/core/core_account"
           comment-delete: "true"
