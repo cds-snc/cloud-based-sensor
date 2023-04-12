@@ -64,10 +64,6 @@ data "aws_iam_policy_document" "log_archive_bucket" {
       type        = "AWS"
       identifiers = local.trusted_replicate_role_arns
     }
-    principals {
-      type        = "AWS"
-      identifiers = [var.core_replicate_role_arn]
-    }
     actions = [
       "s3:ObjectOwnerOverrideToBucketOwner",
       "s3:ReplicateObject",
@@ -82,10 +78,6 @@ data "aws_iam_policy_document" "log_archive_bucket" {
     principals {
       type        = "AWS"
       identifiers = local.trusted_replicate_role_arns
-    }
-    principals {
-      type        = "AWS"
-      identifiers = [var.core_replicate_role_arn]
     }
     actions = [
       "s3:List*",

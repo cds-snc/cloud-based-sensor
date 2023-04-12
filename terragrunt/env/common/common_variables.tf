@@ -43,13 +43,3 @@ variable "satellite_s3_replicate_role_name" {
   description = "Name of the IAM role in each satellite account used to replicate objects to the log archive bucket."
   type        = string
 }
-
-variable "core_replicate_role_arn" {
-  description = "arn of the role used to replicate objects from the core log archive bucket to the CBS archive bucket."
-  type        = string
-}
-
-variable "core_log_archive_bucket_arn" {
-  description = "arn of the bucket in core log archive account accepting logs from the CBS bucket."
-  type        = string
-}
