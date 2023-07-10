@@ -18,7 +18,7 @@ resource "aws_sns_topic_subscription" "cloudwatch_alarm" {
 }
 
 module "notify_slack" {
-  source = "github.com/cds-snc/terraform-modules?ref=v3.0.19//notify_slack"
+  source = "github.com/cds-snc/terraform-modules//notify_slack?ref=v6.1.3"
 
   function_name     = "cbs-notify-slack"
   project_name      = var.account_id

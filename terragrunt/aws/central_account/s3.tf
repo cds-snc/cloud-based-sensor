@@ -12,7 +12,7 @@ locals {
 # Log archive bucket and access logging
 #
 module "log_archive_bucket" {
-  source            = "github.com/cds-snc/terraform-modules?ref=v1.0.4//S3"
+  source            = "github.com/cds-snc/terraform-modules//S3?ref=v6.1.3"
   bucket_name       = var.log_archive_bucket_name
   billing_tag_value = var.billing_tag_value
   kms_key_arn       = aws_kms_key.log_archive_encrypt.arn
@@ -37,7 +37,7 @@ module "log_archive_bucket" {
 }
 
 module "log_archive_access_bucket" {
-  source            = "github.com/cds-snc/terraform-modules?ref=v1.0.4//S3_log_bucket"
+  source            = "github.com/cds-snc/terraform-modules//S3_log_bucket?ref=v6.1.3"
   bucket_name       = "${var.log_archive_bucket_name}-access"
   billing_tag_value = var.billing_tag_value
   force_destroy     = true
