@@ -55,6 +55,7 @@ module "satellite_access_bucket" {
   source            = "github.com/cds-snc/terraform-modules//S3_log_bucket?ref=v6.1.3"
   bucket_name       = "${var.satellite_bucket_name}-access"
   billing_tag_value = var.billing_tag_value
+  versioning_status = "Disabled"
   force_destroy     = true
 }
 
