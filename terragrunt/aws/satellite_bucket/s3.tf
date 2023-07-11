@@ -2,7 +2,7 @@
 # Satellite bucket and access logging
 #
 module "satellite_bucket" {
-  source            = "github.com/cds-snc/terraform-modules//S3?ref=v6.1.3"
+  source            = "github.com/cds-snc/terraform-modules//S3?ref=v6.1.4"
   bucket_name       = var.satellite_bucket_name
   billing_tag_value = var.billing_tag_value
 
@@ -52,7 +52,7 @@ module "satellite_bucket" {
 }
 
 module "satellite_access_bucket" {
-  source            = "github.com/cds-snc/terraform-modules//S3_log_bucket?ref=v6.1.3"
+  source            = "github.com/cds-snc/terraform-modules//S3_log_bucket?ref=v6.1.4"
   bucket_name       = "${var.satellite_bucket_name}-access"
   billing_tag_value = var.billing_tag_value
   versioning_status = "Disabled"
