@@ -13,20 +13,6 @@ resource "aws_sns_topic" "cloudwatch_alarm" {
 
 resource "aws_sns_topic_subscription" "cloudwatch_alarm" {
   topic_arn = aws_sns_topic.cloudwatch_alarm.arn
-  protocol  = "lambda"
-  endpoint  = module.notify_slack.lambda_arn
-}
-
-module "notify_slack" {
-  source = "github.com/cds-snc/terraform-modules//notify_slack?ref=v6.1.5"
-
-  function_name     = "cbs-notify-slack"
-  project_name      = var.account_id
-  slack_webhook_url = var.slack_webhook_url
-  sns_topic_arns = [
-    aws_sns_topic.cloudwatch_alarm.arn
-  ]
-
-  billing_tag_key   = var.billing_tag_key
-  billing_tag_value = var.billing_tag_value
+  protocol  = "https"
+  endpoint  = var.slack_webhook_url
 }
