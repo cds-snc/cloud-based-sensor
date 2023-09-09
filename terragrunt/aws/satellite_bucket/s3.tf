@@ -66,7 +66,7 @@ module "satellite_access_bucket" {
         days = 90
       }
     }
-  ]  
+  ]
 }
 
 resource "aws_s3_bucket_ownership_controls" "satellite_bucket" {
