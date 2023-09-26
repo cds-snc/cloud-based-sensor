@@ -23,4 +23,4 @@ jobs:
         id: set-matrix
         run: |
           accounts=$(jq -n -c "{\"include\": [inputs | {"account": .} ] }"  satellite_accounts)
-          echo "::set-output name=matrix::$accounts"
+          echo "matrix=$accounts" >> "$GITHUB_OUTPUT"
