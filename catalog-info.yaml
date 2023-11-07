@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: cloud-based-sensor
+  description: >-
+    Infrastructure configuration to manage CCCS's Cloud Based Sensor in AWS
+    accounts
+  labels:
+    license: MIT
+spec:
+  type: website
+  lifecycle: experimental
+  owner: platform-core-services
