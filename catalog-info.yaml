@@ -8,6 +8,7 @@ metadata:
   labels:
     license: MIT
 spec:
-  type: website
-  lifecycle: experimental
-  owner: platform-core-services
+  type: service
+  lifecycle: production
+  owner: group:cds-snc/internal-sre
+  domain: site-reliability-engineering
