@@ -19,19 +19,6 @@ data "aws_iam_policy_document" "log_archive_encrypt" {
     }
   }
 
-  # Allow CBS principal to decrypt using the key
-  statement {
-    effect = "Allow"
-    actions = [
-      "kms:Decrypt"
-    ]
-    resources = ["*"]
-    principals {
-      type        = "AWS"
-      identifiers = [var.cbs_principal_arn]
-    }
-  }
-
   # Allow satellite accounts to use the key for encryption
   statement {
     effect = "Allow"
