@@ -95,12 +95,12 @@ data "aws_iam_policy_document" "log_archive_bucket" {
 # Bucket Policy that allows the specified principal to get objects
 #
 
-resource "aws_s3_bucket_policy" "log-archive--bucket-get-objects" {
+resource "aws_s3_bucket_policy" "log-archive-bucket-get-objects" {
   bucket = module.log_archive_bucket.s3_bucket_id
   policy = data.aws_iam_policy_document.log-archive--bucket-get-objects.json
 }
 
-data "aws_iam_policy_document" "log-archive--bucket-get-objects" {
+data "aws_iam_policy_document" "log-archive-bucket-get-objects" {
   statement {
     principals {
       type        = "AWS"
