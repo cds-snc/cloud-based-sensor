@@ -104,7 +104,7 @@ data "aws_iam_policy_document" "log-archive-bucket-get-objects" {
   statement {
     principals {
       type        = "AWS"
-      identifiers = sensitive(var.cbs_principal_role_arn)
+      identifiers = [sensitive(var.cbs_principal_role_arn)]
     }
     effect  = "Allow"
     actions = ["s3:GetObject"]
