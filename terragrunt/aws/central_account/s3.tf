@@ -92,6 +92,30 @@ data "aws_iam_policy_document" "log_archive_bucket" {
 }
 
 #
+# Bucket Policy that allows the specified principal to get objects
+#
+
+resource "aws_s3_bucket_policy" "log-archive--bucket-get-objects" {
+  bucket = module.log_archive_bucket.s3_bucket_id
+  policy = data.aws_iam_policy_document.log-archive--bucket-get-objects.json
+}
+
+data "aws_iam_policy_document" "log-archive--bucket-get-objects" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = "${var.cbs_principal_role_arn}"
+    }
+    effect  = "Allow"
+    actions = ["s3:GetObject"]
+    resources = [
+      "${module.log_archive_bucket.s3_bucket_arn}",
+      "${module.log_archive_bucket.s3_bucket_arn}/*",
+    ]
+  }
+}
+
+#
 # Publish a notification to the SNS topic when objects are created
 #
 resource "aws_s3_bucket_notification" "cbs_transport_lambda" {
