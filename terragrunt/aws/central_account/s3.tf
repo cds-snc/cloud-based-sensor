@@ -89,22 +89,14 @@ data "aws_iam_policy_document" "log_archive_bucket" {
       module.log_archive_bucket.s3_bucket_arn
     ]
   }
-}
 
-#
-# Bucket Policy that allows the specified principal to get objects
-#
-
-resource "aws_s3_bucket_policy" "log-archive-bucket-get-objects" {
-  bucket = module.log_archive_bucket.s3_bucket_id
-  policy = data.aws_iam_policy_document.log-archive-bucket-get-objects.json
-}
-
-data "aws_iam_policy_document" "log-archive-bucket-get-objects" {
+  #
+  # Bucket Policy that allows the specified principal to get objects
+  #
   statement {
     principals {
       type        = "AWS"
-      identifiers = [sensitive(var.cbs_principal_role_arn)]
+      identifiers = [var.cbs_principal_role_arn]
     }
     effect  = "Allow"
     actions = ["s3:GetObject"]
