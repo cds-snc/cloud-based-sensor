@@ -118,4 +118,6 @@ resource "aws_s3_bucket_notification" "cbs_transport_lambda" {
     topic_arn = aws_sns_topic.log_archive.arn
     events    = ["s3:ObjectCreated:*"]
   }
+  # Required for CBS v2.3
+  eventbridge = true
 }

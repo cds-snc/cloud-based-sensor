@@ -14,3 +14,9 @@ variable "cbs_transport_lambda_name" {
   description = "Name of the CBS transport Lambda function"
   type        = string
 }
+
+# Required for CBS v2.3
+
+variable "cbs_destination_event_bus_arn" {
+  type = string
+}
