@@ -12,7 +12,7 @@ data "aws_iam_policy_document" "log_archive_read_assume" {
     actions = ["sts:AssumeRole"]
     principals {
       type        = "AWS"
-      identifiers = [var.cbs_principal_arn]
+      identifiers = [var.cbs_principal_arn, var.cbs_principal_role_arn]
     }
   }
 }
