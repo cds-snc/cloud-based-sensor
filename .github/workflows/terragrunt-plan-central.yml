@@ -20,6 +20,7 @@ env:
   TF_INPUT: false
   TF_VAR_cbs_principal_arn: ${{ secrets.CBS_PRINCIPAL_ARN }}
   TF_VAR_cbs_principal_role_arn: ${{ secrets.CBS_PRINCIPAL_ROLE_ARN }}
+  TF_VAR_cbs_destination_event_bus_arn: ${{ secrets.CBS_DESTINATION_EVENT_BUS_ARN}}
   TF_VAR_slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_CBS }}
 
 permissions:
