@@ -8,7 +8,6 @@ on:
     paths:
       - ".github/workflows/terragrunt-apply-central.yml"
       - "satellite_accounts"
-      - "terragrunt/aws/alarms/**"
       - "terragrunt/aws/central_account/**"
       - "terragrunt/env/central/**"
       - "terragrunt/env/common/**"
@@ -46,9 +45,6 @@ jobs:
         id: filter
         with:
           filters: |
-            alarms:
-              - 'terragrunt/aws/alarms/**'
-              - 'terragrunt/env/central/alarms/**'
             central_account:
               - 'terragrunt/aws/central_account/**'
               - 'terragrunt/env/central/central_account/**'
@@ -68,9 +64,4 @@ jobs:
       - name: Terragrunt apply central account
         if: ${{ steps.filter.outputs.central_account == 'true' || steps.filter.outputs.common == 'true' }}
         working-directory: "terragrunt/env/central/central_account"
-        run: terragrunt apply --terragrunt-non-interactive -auto-approve
-
-      - name: Terragrunt apply alarms
-        if: ${{ steps.filter.outputs.alarms == 'true' || steps.filter.outputs.common == 'true' }}
-        working-directory: "terragrunt/env/central/alarms"
         run: terragrunt apply --terragrunt-non-interactive -auto-approve
