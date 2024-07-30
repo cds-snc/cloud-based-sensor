@@ -6,7 +6,6 @@ on:
     paths:
       - ".github/workflows/terragrunt-plan-central.yml"
       - "satellite_accounts"
-      - "terragrunt/aws/alarms/**"
       - "terragrunt/aws/central_account/**"
       - "terragrunt/env/central/**"
       - "terragrunt/env/common/**"
@@ -45,9 +44,6 @@ jobs:
         id: filter
         with:
           filters: |
-            alarms:
-              - 'terragrunt/aws/alarms/**'
-              - 'terragrunt/env/central/alarms/**'
             central_account:
               - 'terragrunt/aws/central_account/**'
               - 'terragrunt/env/central/central_account/**'
@@ -71,15 +67,5 @@ jobs:
           directory: "terragrunt/env/central/central_account"
           comment-delete: "true"
           comment-title: "Central account"
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-          terragrunt: "true"
-
-      - name: Terragrunt plan alarms
-        if: ${{ steps.filter.outputs.alarms == 'true' || steps.filter.outputs.common == 'true' }}
-        uses: cds-snc/terraform-plan@4719878d72d1b0078e0bce2e7571e854e79903b8 # v3.2.2
-        with:
-          directory: "terragrunt/env/central/alarms"
-          comment-delete: "true"
-          comment-title: "Central Alarms"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           terragrunt: "true"
