@@ -210,7 +210,8 @@ data "aws_iam_policy_document" "load_balancer_write_logs" {
       "s3:PutObject",
     ]
     resources = [
-      "${module.satellite_bucket.s3_bucket_arn}/*",
+      "${module.satellite_bucket.s3_bucket_arn}/AWSLogs/${var.account_id}/*",
+      "${module.satellite_bucket.s3_bucket_arn}/*/AWSLogs/${var.account_id}/*",
     ]
   }
 }
