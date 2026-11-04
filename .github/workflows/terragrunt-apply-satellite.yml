@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   retrieve-accounts:
-    uses: cds-snc/cloud-based-sensor/.github/workflows/retrieve-accounts.yml@ee635707ce492274c45f307e86abfa24b0badd2c # main
+    uses: cds-snc/cloud-based-sensor/.github/workflows/retrieve-accounts.yml@a152ba6b2635457c968b6333e334c5233d12ab66 # main
 
   terragrunt-apply:
     needs: retrieve-accounts
