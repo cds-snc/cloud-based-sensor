@@ -70,13 +70,13 @@ jobs:
       - name: configure aws credentials using OIDC
         uses: aws-actions/configure-aws-credentials@ffc08eae7350b1061d7de219e2135c75561fb680 # master
         with:
-          role-to-assume: arn:aws:iam::871282759583:role/ConfigTerraformReadOnlyRole
+          role-to-assume: arn:aws:iam::871282759583:role/ConfigTerraformAdministratorRole
           role-session-name: CBSGitHubActions
           aws-region: "ca-central-1"
 
       - name: Set the Terragrunt IAM role
         run: |
-          printf 'TERRAGRUNT_IAM_ROLE=arn:aws:iam::%s:role/ConfigTerraformReadOnlyExecutionRole\n' "$SATELLITE_ACCOUNT_ID" >> "$GITHUB_ENV"
+          printf 'TERRAGRUNT_IAM_ROLE=arn:aws:iam::%s:role/ConfigTerraformAdminExecutionRole\n' "$SATELLITE_ACCOUNT_ID" >> "$GITHUB_ENV"
           echo "TERRAGRUNT_IAM_ASSUME_ROLE_SESSION_NAME=CBSGitHubActions" >> $GITHUB_ENV
 
       - name: Terragrunt plan satellite bucket
