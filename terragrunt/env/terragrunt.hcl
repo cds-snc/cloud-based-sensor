@@ -40,3 +40,4 @@ generate "common_variables" {
   if_exists = "overwrite"
   contents  = file("./common/common_variables.tf")
 }
+# plan-check-1: no-op whitespace marker
