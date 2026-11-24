@@ -99,6 +99,18 @@ data "aws_iam_policy_document" "cloudtrail_kms" {
     }
   }
 
+  # Required with an S3 Bucket Key when creating or updating a trail with SSE-KMS.
+  statement {
+    sid       = "AllowCloudTrailDecrypt"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = ["*"]
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+  }
+
   statement {
     sid       = "AllowCloudTrailDescribeKey"
     effect    = "Allow"
