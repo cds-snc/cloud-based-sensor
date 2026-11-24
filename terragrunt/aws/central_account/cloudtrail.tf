@@ -15,7 +15,22 @@ locals {
 # Log delivery bucket
 # ---------------------------------------------------------------------------
 resource "aws_s3_bucket" "cloudtrail_logs" {
+  # checkov:skip=CKV_AWS_144:cross-region replication not needed for ephemeral data
   bucket = "${local.trail_name}-cloudtrail-logs"
+}
+
+resource "aws_s3_bucket_versioning" "cloudtrail_logs" {
+  bucket = aws_s3_bucket.cloudtrail_logs.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_logging" "cloudtrail_logs" {
+  bucket        = aws_s3_bucket.cloudtrail_logs.id
+  target_bucket = module.log_archive_access_bucket.s3_bucket_id
+  target_prefix = "${aws_s3_bucket.cloudtrail_logs.id}/"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "cloudtrail_logs" {
@@ -23,9 +38,74 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudtrail_logs" 
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.cloudtrail.arn
     }
-    bucket_key_enabled = false
+    bucket_key_enabled = true
+  }
+}
+
+# ---------------------------------------------------------------------------
+# KMS key for the trail's log files and delivery bucket
+# ---------------------------------------------------------------------------
+resource "aws_kms_key" "cloudtrail" {
+  description         = "Encrypt CloudTrail log files for ${local.trail_name}"
+  enable_key_rotation = true
+  policy              = data.aws_iam_policy_document.cloudtrail_kms.json
+}
+
+resource "aws_kms_alias" "cloudtrail" {
+  name          = "alias/${local.trail_name}"
+  target_key_id = aws_kms_key.cloudtrail.key_id
+}
+
+data "aws_iam_policy_document" "cloudtrail_kms" {
+  statement {
+    sid       = "EnableAccountAdministration"
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${var.account_id}:root"]
+    }
+  }
+
+  statement {
+    sid       = "AllowCloudTrailEncrypt"
+    effect    = "Allow"
+    actions   = ["kms:GenerateDataKey*"]
+    resources = ["*"]
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = [local.trail_arn]
+    }
+    condition {
+      test     = "StringLike"
+      variable = "kms:EncryptionContext:aws:cloudtrail:arn"
+      values   = ["arn:aws:cloudtrail:*:${var.account_id}:trail/*"]
+    }
+  }
+
+  statement {
+    sid       = "AllowCloudTrailDescribeKey"
+    effect    = "Allow"
+    actions   = ["kms:DescribeKey"]
+    resources = ["*"]
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = [local.trail_arn]
+    }
   }
 }
 
@@ -77,8 +157,10 @@ resource "aws_s3_bucket_policy" "cloudtrail_logs" {
 # Trail: S3 object-level PutObject data events for the log-archive bucket
 # ---------------------------------------------------------------------------
 resource "aws_cloudtrail" "audit_replication_data_events" {
+  # checkov:skip=CKV2_AWS_10:trail only feeds EventBridge; CloudWatch Logs delivery would add ingestion cost with no consumer
   name           = local.trail_name
   s3_bucket_name = aws_s3_bucket.cloudtrail_logs.id
+  kms_key_id     = aws_kms_key.cloudtrail.arn
 
   is_multi_region_trail         = true
   include_global_service_events = true
@@ -108,5 +190,6 @@ resource "aws_cloudtrail" "audit_replication_data_events" {
   depends_on = [
     aws_s3_bucket_policy.cloudtrail_logs,
     aws_s3_bucket_public_access_block.cloudtrail_logs,
+    aws_kms_key.cloudtrail,
   ]
 }
