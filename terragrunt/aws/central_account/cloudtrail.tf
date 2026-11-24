@@ -16,6 +16,9 @@ locals {
 # ---------------------------------------------------------------------------
 resource "aws_s3_bucket" "cloudtrail_logs" {
   # checkov:skip=CKV_AWS_144:cross-region replication not needed for ephemeral data
+  # checkov:skip=CKV_AWS_18:access logging is set in aws_s3_bucket_logging; older checkov can't link it
+  # checkov:skip=CKV_AWS_19:encryption is set in aws_s3_bucket_server_side_encryption_configuration; older checkov can't link it
+  # checkov:skip=CKV_AWS_21:versioning is set in aws_s3_bucket_versioning; older checkov can't link it
   bucket = "${local.trail_name}-cloudtrail-logs"
 }
 
@@ -60,6 +63,10 @@ resource "aws_kms_alias" "cloudtrail" {
 }
 
 data "aws_iam_policy_document" "cloudtrail_kms" {
+  # checkov:skip=CKV_AWS_109: false-positive,`resources = ["*"]` references KMS key policy is attached to
+  # checkov:skip=CKV_AWS_111: false-positive,`resources = ["*"]` references KMS key policy is attached to
+  # checkov:skip=CKV_AWS_356: false-positive,`resources = ["*"]` references KMS key policy is attached to
+
   statement {
     sid       = "EnableAccountAdministration"
     effect    = "Allow"
