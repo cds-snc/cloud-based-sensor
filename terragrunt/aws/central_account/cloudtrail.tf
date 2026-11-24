@@ -97,7 +97,7 @@ resource "aws_cloudtrail" "audit_replication_data_events" {
     }
     field_selector {
       field       = "resources.ARN"
-      starts_with = ["arn:aws:s3:::${var.log_archive_bucket-name}/"]
+      starts_with = ["arn:aws:s3:::${var.log_archive_bucket_name}/"]
     }
     field_selector {
       field  = "resources.type"
