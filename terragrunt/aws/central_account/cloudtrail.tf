@@ -61,7 +61,7 @@ resource "aws_s3_bucket_policy" "cloudtrail_logs" {
         Effect    = "Allow"
         Principal = { Service = "cloudtrail.amazonaws.com" }
         Action    = "s3:PutObject"
-        Resource  = "${aws_s3_bucket.cloudtrail_logs.arn}/AWSLogs/${local.account_id}/*"
+        Resource  = "${aws_s3_bucket.cloudtrail_logs.arn}/AWSLogs/${var.account_id}/*"
         Condition = {
           StringEquals = {
             "AWS:SourceArn" = local.trail_arn
