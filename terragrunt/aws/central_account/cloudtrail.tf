@@ -8,7 +8,7 @@
 
 locals {
   trail_name = "cbs-audit-replication-data-events"
-  trail_arn  = "arn:aws:cloudtrail:${var.region}:${var.account_id}:trail/${local.cloudtrail_name}"
+  trail_arn  = "arn:aws:cloudtrail:${var.region}:${var.account_id}:trail/${local.trail_name}"
 }
 
 # ---------------------------------------------------------------------------
